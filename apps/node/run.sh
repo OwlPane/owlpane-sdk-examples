@@ -4,8 +4,8 @@ cd "$(dirname "$0")"
 # shellcheck source=../../_lib/dogfood-env.sh
 source ../../_lib/dogfood-env.sh node
 
-# shellcheck source=../../scripts/_lib/dogfood-sdk-source.sh
-source ../../scripts/_lib/dogfood-sdk-source.sh
+# shellcheck source=../../_lib/dogfood-sdk-source.sh
+source ../../_lib/dogfood-sdk-source.sh
 if [ "${OWLPANE_SDK_SOURCE}" = "local" ]; then
   # shellcheck source=../../_lib/ensure-emitter-node-deps.sh
   source ../../_lib/ensure-emitter-node-deps.sh

@@ -2,8 +2,8 @@
 # Emitter apps (rust/php/…) use ../apps/node for dogfood-rich-emit.mjs.
 _LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${0}}")" && pwd)"
 _EXAMPLES_ROOT="$(cd "${_LIB_DIR}/.." && pwd)"
-# shellcheck source=../scripts/_lib/dogfood-sdk-source.sh
-source "$_EXAMPLES_ROOT/scripts/_lib/dogfood-sdk-source.sh"
+# shellcheck source=dogfood-sdk-source.sh
+source "$_LIB_DIR/dogfood-sdk-source.sh"
 
 _EMITTER_NODE="$_EXAMPLES_ROOT/apps/node"
 _LOCAL_PKG="${OWLPANE_SDK_LOCAL_PKG:-}"
