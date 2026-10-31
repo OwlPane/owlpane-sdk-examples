@@ -28,7 +28,7 @@ const TOKEN = process.env.OWLPANE_INTERNAL_TOKEN ?? ''
 
 async function main() {
   if (!TOKEN) {
-    console.error('Set OWLPANE_INTERNAL_TOKEN in sdk/examples/.env (same as ingest cell)')
+    console.error('Set OWLPANE_INTERNAL_TOKEN in repo-root .env (same as ingest cell)')
     process.exit(1)
   }
   const body = {

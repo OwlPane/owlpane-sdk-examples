@@ -8,7 +8,7 @@ All targets are scraped by **owlpane-agent** `integrations.cloudScrapes` (see `a
 ## Quick install
 
 ```bash
-cd owlpane/sdk/examples
+cd owlpane/owlpane-sdk-examples
 ./scripts/floci-dashboard-harness.sh start aws
 ./scripts/install-floci-cloud-k8s.sh
 ```
@@ -37,6 +37,6 @@ curl -s localhost:5000/metrics | grep -i aws_ | head
 ## Teardown
 
 ```bash
-kubectl delete -k owlpane/sdk/examples/k8s/floci
-kubectl delete -f owlpane/sdk/examples/k8s/floci/namespace.yaml
+kubectl delete -k owlpane/owlpane-sdk-examples/k8s/floci
+kubectl delete -f owlpane/owlpane-sdk-examples/k8s/floci/namespace.yaml
 ```

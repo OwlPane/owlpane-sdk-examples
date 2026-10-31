@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Full local cloud monitoring + AWS dashboard dogfood (Floci, YACE, emit, verify gate).
 #
-#   cd owlpane/sdk/examples
+#   cd owlpane/owlpane-sdk-examples
 #   cp .env.example .env   # OWLPANE_INGEST_*, API login, OWLPANE_ENVIRONMENT=production
 #   ./scripts/run-local-cloud-dogfood.sh
 #

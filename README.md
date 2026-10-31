@@ -11,7 +11,7 @@ In the console, create **one project per app** (names must match `dogfood.manife
 
 | Console project | Example app | Package / path |
 |-----------------|-------------|----------------|
-| `owlpane-sdk-node` | [`apps/node`](apps/node) | `@owlpane/node` (npm; pin `nodeSdkVersion` in `packages/release-pins/pins.json`) |
+| `owlpane-sdk-node` | [`apps/node`](apps/node) | `@owlpane/node` (npm; version from **`sdk-published.version`** / **`OWLPANE_SDK_VERSION`**) |
 | `owlpane-sdk-go` | [`apps/go`](apps/go) | OTel Go / local `packages/go` (dogfood `replace`) |
 | `owlpane-sdk-python` | [`apps/python`](apps/python) | `owlpane` (PyPI; align with published SDK release) |
 | `owlpane-sdk-java` | [`apps/java`](apps/java) | OpenTelemetry **javaagent** + `OTEL_*` env |
@@ -21,13 +21,13 @@ In the console, create **one project per app** (names must match `dogfood.manife
 | `owlpane-sdk-dotnet` | [`apps/dotnet`](apps/dotnet) | .NET runtime metrics + OTLP (shared emitter) |
 | `owlpane-sdk-react-native` | [`apps/react-native`](apps/react-native) | Mobile-style spans + `telemetry.sdk.language=react-native` (shared emitter) |
 | `owlpane-sdk-serverless` | [`apps/serverless`](apps/serverless) | Lambda-style spans with `faas.name` (shared emitter) |
-| `owlpane-sdk-browser` | [`apps/browser`](apps/browser) | `@owlpane/browser` (Browser RUM; pin in `pins.json`) |
+| `owlpane-sdk-browser` | [`apps/browser`](apps/browser) | `@owlpane/browser` (Browser RUM; same pin file / env) |
 
 Each project gets its **own ingest key** (`owl_ing_*`). `OTEL_SERVICE_NAME` is set to the project slug (same rule as **InstallGuide** in the console).
 
 ```bash
 chmod +x run-dogfood.sh scripts/onboard-dogfood.sh scripts/run-local-demo.sh apps/*/run.sh
-# Creates console projects + keys (Scale org by default), writes examples/.env:
+# Creates console projects + keys (Scale org by default), writes repo-root `.env`:
 ./scripts/onboard-dogfood.sh --write-env
 ./run-dogfood.sh              # one shot per runtime (incl. react-native + serverless)
 ./run-dogfood.sh --loop       # continuous Node demo-server + runtime ticker (see below)
@@ -109,7 +109,7 @@ Console **Observability → Runtimes** filters on `telemetry.sdk.language` (and 
 
 **If runtime pages stay empty:**
 
-1. Match console env to `OWLPANE_ENVIRONMENT` in `examples/.env` (usually `development`).
+1. Match console env to `OWLPANE_ENVIRONMENT` in `.env` (usually `development`).
 2. Confirm ingest: `OWLPANE_INGEST_URL=http://127.0.0.1:4318` and API on `:4100`.
 3. Run `./scripts/onboard-dogfood.sh --write-env` then `./run-dogfood.sh --once` or `run-dogfood-loop-daemon.sh restart`.
 4. Check API logs for `Observability store unreachable` (telemetry lake/timeouts).
@@ -140,7 +140,7 @@ cd ../../../SEO2LS/seo-infra
 ./scripts/deploy-agent-k3s-hetzner.sh
 ```
 
-Defaults: `cluster.name=k3s-cluster`, in-cluster ingest, agent chart pin `agentChartVersion` in `packages/release-pins/pins.json`.
+Defaults: `cluster.name=k3s-cluster`, in-cluster ingest; agent chart pin **`agentChartVersion`** in **`api/release-pins/pins.json`** (Console Setup uses the same file).
 
 **Local Docker Desktop:**
 

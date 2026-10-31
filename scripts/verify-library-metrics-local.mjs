@@ -2,7 +2,7 @@
 /**
  * After emit-dashboard-library-metrics.mjs: check which catalog metrics exist in the tenant (live API).
  *
- *   cd owlpane/sdk/examples
+ *   cd owlpane/owlpane-sdk-examples
  *   node scripts/verify-library-metrics-local.mjs
  *   node scripts/verify-library-metrics-local.mjs --category ArgoCD
  *   node scripts/verify-library-metrics-local.mjs --slug owl-argocd-argocd-monitoring

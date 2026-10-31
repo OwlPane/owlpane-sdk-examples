@@ -3,7 +3,7 @@
  * Quick infrastructure catalog smoke (Cloud cost, Azure catalog, AWS/GCP cloud list).
  * Does not replace Floci + cloudScrapes — use alongside floci-dashboard-harness.sh.
  *
- *   cd owlpane/sdk/examples
+ *   cd owlpane/owlpane-sdk-examples
  *   OWLPANE_INGEST_URL=… OWLPANE_INGEST_KEY_NODE=… OWLPANE_ENVIRONMENT=production \
  *     node scripts/emit-infrastructure-smoke.mjs
  */

@@ -25,7 +25,7 @@ if (!Number.isFinite(minutes) || minutes <= 0) {
 }
 
 if (!api) {
-  console.error('Set OWLPANE_API_URL in sdk/examples/.env')
+  console.error('Set OWLPANE_API_URL in repo-root .env')
   process.exit(1)
 }
 

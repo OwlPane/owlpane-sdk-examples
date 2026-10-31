@@ -2,7 +2,7 @@
 /**
  * After dogfood ticks, verify each manifest app has logs + spans in the API (same env filter).
  *
- *   cd owlpane/sdk/examples
+ *   cd owlpane/owlpane-sdk-examples
  *   node scripts/runtime-parity-smoke.mjs
  *
  * Env: OWLPANE_API_URL, OWLPANE_ONBOARD_EMAIL/PASSWORD (or OWLPANE_BEARER_TOKEN),

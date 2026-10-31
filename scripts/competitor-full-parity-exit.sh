@@ -18,9 +18,9 @@ test -f "$REPO/api/docs/competitive/gap-register.csv"
 
 echo "== optional live E2E (deployed API) =="
 if [[ -n "${OWLPANE_API_URL:-}" ]] && [[ -n "${OWLPANE_ONBOARD_EMAIL:-}${OWLPANE_BEARER_TOKEN:-}" ]]; then
-  node "$REPO/sdk/examples/scripts/e2e-parity-smoke.mjs"
+  node "$ROOT/scripts/e2e-parity-smoke.mjs"
 else
-  echo "skip e2e-parity-smoke (set OWLPANE_API_URL + login env in sdk/examples/.env)"
+  echo "skip e2e-parity-smoke (set OWLPANE_API_URL + login env in repo-root .env)"
 fi
 
 echo "Full parity exit script completed (local e2e: cd api && npm run test:parity:e2e with e2e:api on :4199)."

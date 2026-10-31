@@ -2,7 +2,7 @@
 /**
  * Live E2E smoke against OWLPANE_API_URL: wave3 + APM + realtime alerting preflight.
  *
- *   cd owlpane/sdk/examples
+ *   cd owlpane/owlpane-sdk-examples
  *   node scripts/e2e-parity-smoke.mjs
  *
  * Env: OWLPANE_API_URL, OWLPANE_ONBOARD_EMAIL/PASSWORD (or OWLPANE_BEARER_TOKEN),

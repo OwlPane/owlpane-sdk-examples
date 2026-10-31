@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Floci dogfood in Docker Desktop K8s: YACE (AWS) + static Prometheus textfile exporters (Azure/GCP smoke).
 #
-#   cd owlpane/sdk/examples
+#   cd owlpane/owlpane-sdk-examples
 #   ./scripts/floci-dashboard-harness.sh start aws
 #   ./scripts/install-floci-cloud-k8s.sh
 #   helm upgrade --install owlpane oci://ghcr.io/owlpane/owlpane-agent -n owlpane \

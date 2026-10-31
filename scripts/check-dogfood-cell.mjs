@@ -32,7 +32,7 @@ function isSaasDogfood() {
 
 async function apiHealth() {
   if (!API) {
-    console.error('Set OWLPANE_API_URL in sdk/examples/.env')
+    console.error('Set OWLPANE_API_URL in repo-root .env')
     process.exit(1)
   }
   const res = await fetch(`${API}/healthz`, { signal: AbortSignal.timeout(12_000) })
