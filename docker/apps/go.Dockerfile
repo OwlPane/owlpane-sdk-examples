@@ -1,5 +1,5 @@
 FROM golang:1.23-bookworm
-ARG SDK_VERSION=0.1.8
+ARG SDK_VERSION=0.1.9
 ENV GOTOOLCHAIN=auto
 ENV GOPROXY=https://proxy.golang.org,direct
 # Fresh submodule tags may lag sum.golang.org; fetch from GitHub when needed.

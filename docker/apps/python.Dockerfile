@@ -1,5 +1,5 @@
 FROM python:3.12-slim-bookworm
-ARG SDK_VERSION=0.1.8
+ARG SDK_VERSION=0.1.9
 RUN apt-get update && apt-get install -y --no-install-recommends tini bash && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY _lib ./_lib

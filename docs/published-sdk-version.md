@@ -5,7 +5,7 @@
 **Pin for Docker / `OWLPANE_SDK_SOURCE=published`:**
 
 ```text
-sdk-published.version   → 0.1.8
+sdk-published.version   → 0.1.9
 ```
 
 After a new SDK release:

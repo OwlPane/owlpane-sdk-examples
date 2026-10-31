@@ -2,7 +2,7 @@
 
 Runnable example applications that install the **published** Owlpane SDKs (or standard OpenTelemetry exporters) and emit traces, metrics, structured logs, and browser RUM telemetry to your Owlpane ingest gateway.
 
-**Platform matrix (npm/PyPI packages + OTel-native runtimes):** [docs.owlpane.com/sdk](https://docs.owlpane.com/sdk/node/). SDK source lives in the private **`OwlPane/owlpane-sdk`** repo; install **`@owlpane/node`**, **`@owlpane/browser`**, and **`owlpane`** (Python) from public registries only.
+**Platform matrix:** [docs.owlpane.com/sdk](https://docs.owlpane.com/sdk/node/). **Architecture & release flow:** [docs/architecture.md](./docs/architecture.md). SDK source is private **`OwlPane/owlpane-sdk`**; this repo uses **published** packages only — pin **`sdk-published.version`** and run **`./scripts/sync-pinned-sdk-version.sh`** after each SDK release.
 
 ## Standard onboarding (one project per app)
 
@@ -90,7 +90,7 @@ Copy [`.env.local.example`](.env.local.example) or let `run-local-demo.sh` onboa
 
 ### Local dogfood loop (all runtimes)
 
-Console **Observability → Runtimes** filters on `telemetry.sdk.language` (and **Serverless** on `faas.name`) in the selected **Deploy env** and time range (e.g. **development**, **LAST 6H**). Full implementation guide: [`../docs/runtime-telemetry.md`](../docs/runtime-telemetry.md).
+Console **Observability → Runtimes** filters on `telemetry.sdk.language` (and **Serverless** on `faas.name`) in the selected **Deploy env** and time range (e.g. **development**, **LAST 6H**). See [docs.owlpane.com](https://docs.owlpane.com/sdk/node/) for runtime telemetry details.
 
 | Mode | What runs | Which runtime tabs get data |
 |------|-----------|------------------------------|

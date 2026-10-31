@@ -1,2 +1,2 @@
-owlpane==0.1.8
+owlpane==0.1.9
 opentelemetry-instrumentation-system-metrics>=0.49b0
