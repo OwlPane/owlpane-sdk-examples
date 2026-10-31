@@ -1,12 +1,17 @@
 # Same as docker/apps/demo-server.Dockerfile — build context is repo root.
 FROM node:22-alpine
+ARG SDK_VERSION
 WORKDIR /app
-RUN apk add --no-cache tini
+RUN apk add --no-cache tini bash
+COPY sdk-published.version ./sdk-published.version
+COPY docker/resolve-sdk-version.sh /docker/resolve-sdk-version.sh
+RUN chmod +x /docker/resolve-sdk-version.sh
 COPY apps/demo-server/src ./src
-RUN npm init -y >/dev/null \
+RUN SDK_V="$(/docker/resolve-sdk-version.sh)" \
+  && npm init -y >/dev/null \
   && npm pkg set type=module \
   && npm pkg set scripts.start="node --import tsx src/server.ts" \
-  && npm install --no-audit --no-fund @owlpane/node@^0.1.9 tsx@^4.20.6 typescript@^5.9.3
+  && npm install --no-audit --no-fund "@owlpane/node@${SDK_V}" tsx@^4.20.6 typescript@^5.9.3
 ENV NODE_ENV=production \
     OWLPANE_METRICS_EXPORT_INTERVAL_MS=5000 \
     DEMO_INTERVAL_MS=3000 \

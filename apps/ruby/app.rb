@@ -23,7 +23,7 @@ OpenTelemetry::SDK.configure do |c|
   c.resource = OpenTelemetry::SDK::Resources::Resource.create(
     {
       "deployment.environment.name" => ENV.fetch("OWLPANE_ENVIRONMENT", "development"),
-      "service.version" => "0.1.9",
+      "service.version" => ENV.fetch("OWLPANE_SERVICE_VERSION") { ENV.fetch("OWLPANE_SDK_VERSION") },
       "telemetry.sdk.language" => "ruby",
     },
   )

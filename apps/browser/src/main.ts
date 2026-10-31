@@ -21,7 +21,7 @@ const rum = init({
   projectKey,
   serviceName,
   environment,
-  release: "0.1.9",
+  release: process.env.OWLPANE_SERVICE_VERSION ?? process.env.OWLPANE_SDK_VERSION,
   env: {
     now: () => Date.now(),
     performance: {

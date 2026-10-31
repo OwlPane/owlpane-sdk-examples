@@ -44,4 +44,4 @@ flowchart LR
 2. `./scripts/onboard-dogfood.sh --write-env` (needs API + console).
 3. `./run-dogfood.sh` — installs **`@owlpane/node@<sdk-published.version>`** from npm unless you override `OWLPANE_SDK_SOURCE`.
 
-After an SDK release, run **`./scripts/sync-pinned-sdk-version.sh`** whenever **`sdk-published.version`** changes.
+After an SDK release, update **`sdk-published.version`** (e.g. **`./scripts/sync-pinned-sdk-version.sh <semver>`**). Docker and `run.sh` read that file or **`OWLPANE_SDK_VERSION`** / **`SDK_VERSION`** — no mass string replace across the repo.

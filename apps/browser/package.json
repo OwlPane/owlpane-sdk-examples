@@ -6,7 +6,7 @@
     "start": "node --import tsx src/main.ts"
   },
   "dependencies": {
-    "@owlpane/browser": "0.1.9"
+    "@owlpane/browser": "*"
   },
   "devDependencies": {
     "tsx": "^4.20.6",

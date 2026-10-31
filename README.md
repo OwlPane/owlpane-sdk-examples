@@ -2,7 +2,7 @@
 
 Runnable example applications that install the **published** Owlpane SDKs (or standard OpenTelemetry exporters) and emit traces, metrics, structured logs, and browser RUM telemetry to your Owlpane ingest gateway.
 
-**Platform matrix:** [docs.owlpane.com/sdk](https://docs.owlpane.com/sdk/node/). **Architecture & release flow:** [docs/architecture.md](./docs/architecture.md). SDK source is private **`OwlPane/owlpane-sdk`**; this repo uses **published** packages only — pin **`sdk-published.version`** and run **`./scripts/sync-pinned-sdk-version.sh`** after each SDK release.
+**Platform matrix:** [docs.owlpane.com/sdk](https://docs.owlpane.com/sdk/node/). **Architecture & release flow:** [docs/architecture.md](./docs/architecture.md). SDK source is private **`OwlPane/owlpane-sdk`**; this repo uses **published** packages only — pin **`sdk-published.version`** (or **`./scripts/sync-pinned-sdk-version.sh <semver>`**) after each SDK release; optional **`OWLPANE_SDK_VERSION`** in `.env` for local override.
 
 ## Standard onboarding (one project per app)
 

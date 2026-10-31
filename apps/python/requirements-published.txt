@@ -1,2 +1,2 @@
-owlpane==0.1.9
-opentelemetry-instrumentation-system-metrics>=0.49b0
+# Version pinned at install from sdk-published.version / OWLPANE_SDK_VERSION
+owlpane

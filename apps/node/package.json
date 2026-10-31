@@ -8,7 +8,7 @@
   "dependencies": {
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/api-logs": "^0.57.0",
-    "@owlpane/node": "0.1.9",
+    "@owlpane/node": "*",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }

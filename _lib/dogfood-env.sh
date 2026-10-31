@@ -5,6 +5,8 @@ set -euo pipefail
 
 _LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-${0}}")" && pwd)"
 _EXAMPLES_ROOT="$(cd "${_LIB_DIR}/.." && pwd)"
+# shellcheck source=sdk-version.sh
+source "$_LIB_DIR/sdk-version.sh"
 if [ -f "$_EXAMPLES_ROOT/.env" ]; then
   set -a
   # shellcheck disable=SC1091
@@ -132,7 +134,10 @@ case "$APP_ID" in
   serverless) LANG_ATTR="telemetry.sdk.language=nodejs,cloud.provider=aws,cloud.platform=aws_lambda" ;;
   *) LANG_ATTR="" ;;
 esac
-BASE_ATTRS="deployment.environment.name=${OWLPANE_ENVIRONMENT},service.version=0.1.9"
+OWLPANE_SDK_VERSION="$(read_sdk_published_version "$_LIB_DIR/sdk-version.sh")"
+export OWLPANE_SDK_VERSION
+export OWLPANE_SERVICE_VERSION="${OWLPANE_SERVICE_VERSION:-$OWLPANE_SDK_VERSION}"
+BASE_ATTRS="deployment.environment.name=${OWLPANE_ENVIRONMENT},service.version=${OWLPANE_SERVICE_VERSION}"
 if [ -n "$LANG_ATTR" ]; then
   export OTEL_RESOURCE_ATTRIBUTES="${BASE_ATTRS},${LANG_ATTR}"
 else

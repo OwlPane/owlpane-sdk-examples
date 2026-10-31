@@ -1,16 +1,18 @@
 FROM node:22-alpine
-ARG SDK_VERSION=0.1.9
+ARG SDK_VERSION
 RUN apk add --no-cache tini bash
 WORKDIR /app
+COPY sdk-published.version ./sdk-published.version
 COPY _lib ./_lib
 COPY dogfood.manifest.json ./
-COPY docker/app-k8s-entrypoint.sh docker/npm-install-published-node.sh /docker/
-RUN chmod +x /docker/app-k8s-entrypoint.sh /docker/npm-install-published-node.sh
+COPY docker/app-k8s-entrypoint.sh docker/npm-install-published-node.sh docker/resolve-sdk-version.sh /docker/
+RUN chmod +x /docker/app-k8s-entrypoint.sh /docker/npm-install-published-node.sh /docker/resolve-sdk-version.sh
 COPY apps/demo-server/package.json ./apps/demo-server/
 COPY apps/demo-server/src ./apps/demo-server/src
 COPY apps/demo-server/run.sh ./apps/demo-server/
-RUN chmod +x apps/demo-server/run.sh \
-  && /docker/npm-install-published-node.sh "${SDK_VERSION}" apps/demo-server
+RUN SDK_V="$(/docker/resolve-sdk-version.sh)" \
+  && chmod +x apps/demo-server/run.sh \
+  && /docker/npm-install-published-node.sh "${SDK_V}" apps/demo-server
 ENV NODE_ENV=production \
     OWLPANE_DOGFOOD_APP_ID=demo-server \
     OWLPANE_EXAMPLE_MODE=server \
