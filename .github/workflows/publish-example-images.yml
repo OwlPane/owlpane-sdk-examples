@@ -2,6 +2,15 @@
 name: Publish SDK example images
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/**"
+      - "docker/**"
+      - "sdk-published.version"
+      - "dogfood.manifest.json"
+      - "_lib/**"
+      - ".github/workflows/publish-example-images.yml"
   workflow_dispatch:
     inputs:
       sdk_version:
@@ -31,6 +40,9 @@ jobs:
       - id: meta
         run: |
           SDK_VERSION="${{ github.event.inputs.sdk_version }}"
+          if [ -z "$SDK_VERSION" ] && [ -n "${{ github.event.client_payload.sdk_version }}" ]; then
+            SDK_VERSION="${{ github.event.client_payload.sdk_version }}"
+          fi
           if [ -z "$SDK_VERSION" ]; then
             SDK_VERSION="$(tr -d ' \n\r' < sdk-published.version)"
           fi
