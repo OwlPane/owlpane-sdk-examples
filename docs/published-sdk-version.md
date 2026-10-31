@@ -20,8 +20,8 @@ Helpers:
 After a new SDK release:
 
 1. Run `./scripts/sync-pinned-sdk-version.sh <semver>` (or edit **`sdk-published.version`**) and push **`main`**.
-2. **Publish SDK example images** runs automatically (`.github/workflows/publish-sdk-example-images.yml`).
-3. Or trigger from **owlpane-sdk** after `sdk-v*` (needs **`SDK_EXAMPLES_DISPATCH_TOKEN`**) — waits for npm/PyPI, then builds GHCR **`sdk-example-*`** images.
+2. **Publish SDK example images** runs automatically (`.github/workflows/publish-sdk-example-images.yml`), or trigger from **owlpane-sdk** after `sdk-v*` (needs **`SDK_EXAMPLES_DISPATCH_TOKEN`**) — waits for npm/PyPI, then builds GHCR **`sdk-example-*`** images.
+3. If GHCR push fails with `permission_denied: read_package`, see [ghcr-publish-troubleshooting.md](./ghcr-publish-troubleshooting.md) (org package ACL + optional **`GHCR_PUSH_TOKEN`**).
 
 Local dev uses published npm/PyPI only (no monorepo `file:` links in this repo).
 
