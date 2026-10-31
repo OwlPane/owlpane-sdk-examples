@@ -1,0 +1,131 @@
+# GHCR image per example app. Pin tag in seo-infra helm-charts/owlpane-sdk-examples/values-hetzner.yaml.
+name: Publish SDK example images
+
+on:
+  workflow_dispatch:
+    inputs:
+      sdk_version:
+        description: Published @owlpane/node version (default sdk-published.version)
+        required: false
+  repository_dispatch:
+    types: [sdk-published]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  GIT_EMAIL: github-actions[bot]@users.noreply.github.com
+  GIT_USERNAME: github-actions[bot]
+  HELM_HETZNER: helm-charts/owlpane-sdk-examples/values-hetzner.yaml
+
+jobs:
+  meta:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      sdk_version: ${{ steps.meta.outputs.sdk_version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: meta
+        run: |
+          SDK_VERSION="${{ github.event.inputs.sdk_version }}"
+          if [ -z "$SDK_VERSION" ]; then
+            SDK_VERSION="$(tr -d ' \n\r' < sdk-published.version)"
+          fi
+          SHA="$(git rev-parse HEAD)"
+          VERSION="$(date -u +'%Y.%m.%d')-${GITHUB_RUN_NUMBER}-$(echo "$SHA" | cut -c1-7)"
+          echo "sdk_version=$SDK_VERSION" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: meta
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: node
+            dockerfile: docker/apps/node.Dockerfile
+          - id: go
+            dockerfile: docker/apps/go.Dockerfile
+          - id: python
+            dockerfile: docker/apps/python.Dockerfile
+          - id: java
+            dockerfile: docker/apps/java.Dockerfile
+          - id: ruby
+            dockerfile: docker/apps/ruby.Dockerfile
+          - id: browser
+            dockerfile: docker/apps/browser.Dockerfile
+          - id: demo-server
+            dockerfile: docker/apps/demo-server.Dockerfile
+          - id: pii-canary
+            dockerfile: docker/apps/pii-canary.Dockerfile
+          - id: rust
+            dockerfile: docker/apps/emitter.Dockerfile
+            build_arg: APP_ID=rust
+          - id: php
+            dockerfile: docker/apps/emitter.Dockerfile
+            build_arg: APP_ID=php
+          - id: dotnet
+            dockerfile: docker/apps/emitter.Dockerfile
+            build_arg: APP_ID=dotnet
+          - id: react-native
+            dockerfile: docker/apps/emitter.Dockerfile
+            build_arg: APP_ID=react-native
+          - id: serverless
+            dockerfile: docker/apps/emitter.Dockerfile
+            build_arg: APP_ID=serverless
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "IMAGE_OWNER=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_ENV"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push sdk-example-${{ matrix.id }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          platforms: linux/amd64
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/sdk-example-${{ matrix.id }}:${{ needs.meta.outputs.version }}
+          build-args: |
+            SDK_VERSION=${{ needs.meta.outputs.sdk_version }}
+            ${{ matrix.build_arg }}
+          secrets: |
+            github_token=${{ secrets.GITHUB_TOKEN }}
+          cache-from: type=gha,scope=${{ matrix.id }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.id }}
+
+  gitops:
+    needs: [meta, build]
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          wget -qO /usr/local/bin/yq \
+            https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
+          chmod +x /usr/local/bin/yq
+      - uses: actions/checkout@v4
+        id: checkout_infra
+        continue-on-error: true
+        with:
+          repository: balaji-singh/seo-infra
+          path: seo-infra
+          token: ${{ secrets.GIT_TOKEN }}
+          fetch-depth: 1
+      - if: steps.checkout_infra.outcome == 'success'
+        working-directory: seo-infra
+        run: yq -i ".imageTag = \"${{ needs.meta.outputs.version }}\"" "${{ env.HELM_HETZNER }}"
+      - if: steps.checkout_infra.outcome == 'success'
+        working-directory: seo-infra
+        run: |
+          git config user.email "${{ env.GIT_EMAIL }}"
+          git config user.name "${{ env.GIT_USERNAME }}"
+          git add "${{ env.HELM_HETZNER }}"
+          git diff --staged --quiet || \
+            (git commit -m "chore(sdk-examples): imageTag ${{ needs.meta.outputs.version }}" && git push)

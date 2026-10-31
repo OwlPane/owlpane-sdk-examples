@@ -1,0 +1,91 @@
+# YACE → Floci AWS emulator on the Docker Desktop host (:4566).
+# Override awsEndpointUrl in the ConfigMap below if host.docker.internal is unavailable (Linux: often works on Docker Desktop).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: yace-env
+  namespace: owlpane-floci
+data:
+  aws_endpoint_url: "http://host.docker.internal:4566"
+  # If YACE cannot reach Floci, try: http://localhost.floci.io:4566 (matches floci env on host)
+  aws_region: "us-east-1"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yace
+  namespace: owlpane-floci
+  labels:
+    app: yace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yace
+  template:
+    metadata:
+      labels:
+        app: yace
+    spec:
+      containers:
+        - name: yace
+          image: quay.io/prometheuscommunity/yet-another-cloudwatch-exporter:latest
+          args:
+            - --config.file=/config/config.yml
+            - --listen-address=:5000
+            - --scraping-interval=60
+          ports:
+            - name: metrics
+              containerPort: 5000
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              value: test
+            - name: AWS_SECRET_ACCESS_KEY
+              value: test
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: yace-env
+                  key: aws_region
+            - name: AWS_ENDPOINT_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: yace-env
+                  key: aws_endpoint_url
+            - name: AWS_EC2_METADATA_DISABLED
+              value: "true"
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+      volumes:
+        - name: config
+          configMap:
+            name: yace-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: yace
+  namespace: owlpane-floci
+  labels:
+    app: yace
+spec:
+  selector:
+    app: yace
+  ports:
+    - name: metrics
+      port: 5000
+      targetPort: metrics

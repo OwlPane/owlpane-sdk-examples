@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: owlpane-floci
+resources:
+  - yace-config.yaml
+  - yace-deployment.yaml
+  - static-prom-azure.yaml
+  - static-prom-gcp.yaml
+# namespace.yaml applied separately (Namespace cannot use kustomize namespace: transformer)

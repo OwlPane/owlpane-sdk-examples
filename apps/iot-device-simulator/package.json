@@ -1,0 +1,14 @@
+{
+  "name": "iot-device-simulator",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --import tsx src/simulator.ts"
+  },
+  "dependencies": {
+    "@owlpane/node": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0"
+  }
+}

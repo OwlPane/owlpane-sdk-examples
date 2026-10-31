@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: yace-config
+  namespace: owlpane-floci
+data:
+  config.yml: |
+    apiVersion: v1alpha1
+    sts-region: us-east-1
+    discovery:
+      jobs:
+        - type: AWS/SQS
+          regions:
+            - us-east-1
+          period: 60
+          length: 60
+          metrics:
+            - name: NumberOfMessagesSent
+              statistics:
+                - Sum
+                - Average
+            - name: ApproximateNumberOfMessagesVisible
+              statistics:
+                - Average
+            - name: NumberOfMessagesDeleted
+              statistics:
+                - Average

@@ -1,0 +1,8 @@
+# Merge into owlpane-api Helm release (same chart as API).
+# Requires ingest: OWLPANE_TELEMETRY_KAFKA_BROKERS → broker Service DNS.
+
+alertWorker:
+  enabled: true
+  replicaCount: 1
+  extraEnv:
+    OWLPANE_TELEMETRY_KAFKA_BROKERS: "owlpane-demo-kafka.owlpane-demo.svc.cluster.local:9092"

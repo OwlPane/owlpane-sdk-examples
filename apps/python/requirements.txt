@@ -1,0 +1,2 @@
+-e ../../../packages/python
+opentelemetry-instrumentation-system-metrics>=0.49b0

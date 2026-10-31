@@ -1,0 +1,83 @@
+{
+  "description": "One Owlpane console project (and ingest key) per app — same as customer onboarding.",
+  "apps": [
+    {
+      "id": "node",
+      "project": "owlpane-sdk-node",
+      "dir": "apps/node",
+      "ingestKeyEnv": "OWLPANE_INGEST_KEY_NODE"
+    },
+    {
+      "id": "go",
+      "project": "owlpane-sdk-go",
+      "dir": "apps/go",
+      "ingestKeyEnv": "OWLPANE_INGEST_KEY_GO"
+    },
+    {
+      "id": "python",
+      "project": "owlpane-sdk-python",
+      "dir": "apps/python",
+      "ingestKeyEnv": "OWLPANE_INGEST_KEY_PYTHON"
+    },
+    {
+      "id": "java",
+      "project": "owlpane-sdk-java",
+      "dir": "apps/java",
+      "ingestKeyEnv": "OWLPANE_INGEST_KEY_JAVA"
+    },
+    {
+      "id": "ruby",
+      "project": "owlpane-sdk-ruby",
+      "dir": "apps/ruby",
+      "ingestKeyEnv": "OWLPANE_INGEST_KEY_RUBY"
+    },
+    {
+      "id": "rust",
+      "project": "owlpane-sdk-rust",
+      "dir": "apps/rust",
+      "ingestKeyEnv": "OWLPANE_INGEST_KEY_RUST"
+    },
+    {
+      "id": "php",
+      "project": "owlpane-sdk-php",
+      "dir": "apps/php",
+      "ingestKeyEnv": "OWLPANE_INGEST_KEY_PHP"
+    },
+    {
+      "id": "dotnet",
+      "project": "owlpane-sdk-dotnet",
+      "dir": "apps/dotnet",
+      "ingestKeyEnv": "OWLPANE_INGEST_KEY_DOTNET"
+    },
+    {
+      "id": "browser",
+      "project": "owlpane-sdk-browser",
+      "dir": "apps/browser",
+      "ingestKeyEnv": "OWLPANE_INGEST_KEY_BROWSER"
+    },
+    {
+      "id": "react-native",
+      "project": "owlpane-sdk-react-native",
+      "dir": "apps/react-native",
+      "ingestKeyEnv": "OWLPANE_INGEST_KEY_REACT_NATIVE"
+    },
+    {
+      "id": "serverless",
+      "project": "owlpane-sdk-serverless",
+      "dir": "apps/serverless",
+      "ingestKeyEnv": "OWLPANE_INGEST_KEY_SERVERLESS"
+    },
+    {
+      "id": "demo-server",
+      "project": "owlpane-demo-server",
+      "dir": "apps/demo-server",
+      "ingestKeyEnv": "OWLPANE_INGEST_KEY_DEMO"
+    },
+    {
+      "id": "pii-canary",
+      "project": "pii-canary",
+      "dir": "pii-canary",
+      "ingestKeyEnv": "OWLPANE_INGEST_KEY_PII"
+    }
+  ]
+}

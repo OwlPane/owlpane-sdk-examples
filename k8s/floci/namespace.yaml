@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: owlpane-floci
+  labels:
+    app.kubernetes.io/part-of: owlpane-dogfood

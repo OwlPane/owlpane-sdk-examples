@@ -1,0 +1,17 @@
+{
+  "name": "owlpane-pii-canary",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node --import tsx src/main.ts",
+    "emit": "curl -s -X POST http://127.0.0.1:5199/emit"
+  },
+  "dependencies": {
+    "@owlpane/node": "0.1.8",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/api-logs": "^0.57.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

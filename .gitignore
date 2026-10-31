@@ -1,0 +1,12 @@
+.env
+.dogfood-laptop-off
+apps/node/node_modules
+apps/node/.npmrc
+apps/python/.venv
+apps/go/go.sum
+apps/java/lib
+apps/java/out
+apps/ruby/vendor
+apps/ruby/.bundle
+pii-canary/node_modules
+sdk-*/

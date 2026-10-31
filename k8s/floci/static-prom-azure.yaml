@@ -1,0 +1,109 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: static-prom-azure
+  labels:
+    app: static-prom-azure
+data:
+  metrics.prom: |
+    # TYPE azure_monitor_available_memory_bytes gauge
+    azure_monitor_available_memory_bytes 4294967296
+    # TYPE azure_monitor_cpu_percentage gauge
+    azure_monitor_cpu_percentage 12.5
+    # TYPE azure_network_bytes_total counter
+    azure_network_bytes_total 1048576
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: static-prom-azure
+  labels:
+    app: static-prom-azure
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: static-prom-azure
+  template:
+    metadata:
+      labels:
+        app: static-prom-azure
+    spec:
+      containers:
+        - name: exporter
+          image: prom/node-exporter:v1.8.2
+          args:
+            - --web.listen-address=:8080
+            - --path.rootfs=/host
+            - --collector.textfile.directory=/textfile
+            - --collector.textfile
+            - --no-collector.wifi
+            - --no-collector.hwmon
+            - --no-collector.arp
+            - --no-collector.bcache
+            - --no-collector.bonding
+            - --no-collector.conntrack
+            - --no-collector.cpu
+            - --no-collector.diskstats
+            - --no-collector.edac
+            - --no-collector.entropy
+            - --no-collector.filefd
+            - --no-collector.filesystem
+            - --no-collector.infiniband
+            - --no-collector.ipvs
+            - --no-collector.loadavg
+            - --no-collector.mdadm
+            - --no-collector.meminfo
+            - --no-collector.netclass
+            - --no-collector.netdev
+            - --no-collector.netstat
+            - --no-collector.nfs
+            - --no-collector.nfsd
+            - --no-collector.pressure
+            - --no-collector.rapl
+            - --no-collector.schedstat
+            - --no-collector.sockstat
+            - --no-collector.softnet
+            - --no-collector.stat
+            - --no-collector.systemd
+            - --no-collector.tapestats
+            - --no-collector.thermal_zone
+            - --no-collector.time
+            - --no-collector.timex
+            - --no-collector.udp_queues
+            - --no-collector.uname
+            - --no-collector.vmstat
+            - --no-collector.xfs
+            - --no-collector.zfs
+          ports:
+            - containerPort: 8080
+              name: metrics
+          volumeMounts:
+            - name: textfile
+              mountPath: /textfile
+              readOnly: true
+            - name: host
+              mountPath: /host
+              readOnly: true
+      volumes:
+        - name: textfile
+          configMap:
+            name: static-prom-azure
+        - name: host
+          hostPath:
+            path: /
+            type: Directory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: static-prom-azure
+  labels:
+    app: static-prom-azure
+spec:
+  selector:
+    app: static-prom-azure
+  ports:
+    - name: metrics
+      port: 8080
+      targetPort: 8080

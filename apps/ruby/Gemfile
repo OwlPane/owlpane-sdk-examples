@@ -1,0 +1,8 @@
+source "https://rubygems.org"
+
+gem "opentelemetry-sdk", "~> 1.6"
+gem "opentelemetry-exporter-otlp", "~> 0.29"
+gem "opentelemetry-metrics-api", "~> 0.10"
+gem "opentelemetry-metrics-sdk", "~> 0.22"
+gem "opentelemetry-exporter-otlp-metrics", "~> 0.15"
+gem "opentelemetry-exporter-otlp-common", "~> 0.4"

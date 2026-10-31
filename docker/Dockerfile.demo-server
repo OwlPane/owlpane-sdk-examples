@@ -1,0 +1,17 @@
+# Same as docker/apps/demo-server.Dockerfile — build context is repo root.
+FROM node:22-alpine
+WORKDIR /app
+RUN apk add --no-cache tini
+COPY apps/demo-server/src ./src
+RUN npm init -y >/dev/null \
+  && npm pkg set type=module \
+  && npm pkg set scripts.start="node --import tsx src/server.ts" \
+  && npm install --no-audit --no-fund @owlpane/node@^0.1.8 tsx@^4.20.6 typescript@^5.9.3
+ENV NODE_ENV=production \
+    OWLPANE_METRICS_EXPORT_INTERVAL_MS=5000 \
+    DEMO_INTERVAL_MS=3000 \
+    DEMO_BIND_HOST=0.0.0.0 \
+    DEMO_SERVER_PORT=4399
+EXPOSE 4399
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["npm", "run", "start"]

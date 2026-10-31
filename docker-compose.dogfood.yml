@@ -1,0 +1,28 @@
+# Continuous telemetry for local/Docker Desktop observability checks.
+# Prereq: cell ingest on host :4318, examples/.env with OWLPANE_INGEST_KEY_DEMO from onboard.
+#
+#   ./scripts/onboard-dogfood.sh --write-env
+#   ./scripts/run-docker-dogfood.sh
+#
+name: owlpane-dogfood
+
+services:
+  demo-server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.demo-server
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      OWLPANE_INGEST_URL: ${OWLPANE_INGEST_URL:-http://host.docker.internal:4318}
+      OWLPANE_INGEST_KEY: ${OWLPANE_INGEST_KEY_DEMO:?Set OWLPANE_INGEST_KEY_DEMO in examples/.env (run onboard-dogfood.sh)}
+      OTEL_SERVICE_NAME: owlpane-demo-server
+      OWLPANE_ENVIRONMENT: ${OWLPANE_ENVIRONMENT:-development}
+      OWLPANE_DOGFOOD_MODE: ${OWLPANE_DOGFOOD_MODE:-rich}
+      DEMO_INTERVAL_MS: ${DEMO_INTERVAL_MS:-3000}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "127.0.0.1:4399:4399"
+    restart: unless-stopped
