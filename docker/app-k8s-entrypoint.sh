@@ -2,7 +2,8 @@
 # In-cluster: env from Kubernetes (ingest URL, one ingest key, OTEL_SERVICE_NAME).
 set -euo pipefail
 APP_ID="${OWLPANE_DOGFOOD_APP_ID:?set OWLPANE_DOGFOOD_APP_ID}"
-EXAMPLES_ROOT="${EXAMPLES_ROOT:-/app/examples}"
+# Slim per-app images use WORKDIR /app (apps/<id> or pii-canary/ at repo root).
+EXAMPLES_ROOT="${EXAMPLES_ROOT:-/app}"
 INTERVAL="${DOGFOOD_INTERVAL_SEC:-45}"
 MODE="${OWLPANE_EXAMPLE_MODE:-loop}"
 
