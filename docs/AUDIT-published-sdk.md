@@ -21,6 +21,7 @@
 2. **`sdk/examples/`** legacy tree on **owlpane-sdk** — dogfood source of truth is **owlpane-sdk-examples** only; trim SDK repo when ready.
 3. **seo-infra** `helm-charts/owlpane-sdk-examples/values-hetzner.yaml` **`imageTag`** updates via examples CI when **`GIT_TOKEN`** is set.
 4. **`SDK_EXAMPLES_DISPATCH_TOKEN`** on owlpane-sdk for automatic example image builds after publish (optional; manual `workflow_dispatch` works).
+5. **GHCR push** — if CI fails with `permission_denied: read_package`, see [ghcr-publish-troubleshooting.md](./ghcr-publish-troubleshooting.md) (org package access + optional **`GHCR_PUSH_TOKEN`**).
 
 ## Verify
 
