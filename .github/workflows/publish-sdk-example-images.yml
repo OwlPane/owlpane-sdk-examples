@@ -1,6 +1,6 @@
-# Canonical GHCR pipeline for sdk-example-* images (moved from private owlpane-sdk).
-# Pins seo-infra helm-charts/owlpane-sdk-examples/values-hetzner.yaml imageTag when GIT_TOKEN is set.
-name: Publish SDK example images
+# GHCR packages sdk-example-* are linked to OwlPane/owlpane-sdk (not this repo).
+# Docker build + push: OwlPane/owlpane-sdk → Publish SDK example images workflow.
+name: Publish SDK example images (delegate)
 
 on:
   push:
@@ -27,22 +27,13 @@ on:
 
 permissions:
   contents: read
-  packages: write
-  # Required for docker/build-push-action attestations on some runners (harmless if unused).
-  id-token: write
-
-env:
-  REGISTRY: ghcr.io
-  GIT_EMAIL: github-actions[bot]@users.noreply.github.com
-  GIT_USERNAME: github-actions[bot]
-  HELM_HETZNER: helm-charts/owlpane-sdk-examples/values-hetzner.yaml
 
 jobs:
   meta:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.meta.outputs.version }}
       sdk_version: ${{ steps.meta.outputs.sdk_version }}
+      examples_ref: ${{ steps.meta.outputs.examples_ref }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
@@ -57,124 +48,28 @@ jobs:
           if [ -z "$SDK_VERSION" ]; then
             SDK_VERSION="$(tr -d ' \n\r' < sdk-published.version)"
           fi
-          WAIT="${{ github.event.inputs.wait_for_registries }}"
-          if [ "$WAIT" = "true" ] || [ "${{ github.event_name }}" = "repository_dispatch" ] || [ "${{ github.event_name }}" = "push" ]; then
-            echo "Waiting for @owlpane/node@${SDK_VERSION} on npm (and owlpane on PyPI when used)..."
-            ready=0
-            for i in $(seq 1 40); do
-              npm view "@owlpane/node@${SDK_VERSION}" version >/dev/null 2>&1 || { sleep 15; continue; }
-              curl -fsSL "https://pypi.org/pypi/owlpane/json" | grep -q "\"${SDK_VERSION}\"" || { sleep 15; continue; }
-              echo "Registries ready after ${i} attempt(s)"
-              ready=1
-              break
-            done
-            if [ "$ready" != "1" ]; then
-              echo "::error::@owlpane/node@${SDK_VERSION} not on npm yet — publish SDK first, then re-run this workflow"
-              exit 1
-            fi
-          fi
-          SHA="$(git rev-parse HEAD)"
-          VERSION="$(date -u +'%Y.%m.%d')-${GITHUB_RUN_NUMBER}-$(echo "$SHA" | cut -c1-7)"
           echo "sdk_version=$SDK_VERSION" >> "$GITHUB_OUTPUT"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "examples_ref=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
 
-  build:
+  trigger-sdk-publish:
     needs: meta
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - id: node
-            dockerfile: docker/apps/node.Dockerfile
-          - id: go
-            dockerfile: docker/apps/go.Dockerfile
-          - id: python
-            dockerfile: docker/apps/python.Dockerfile
-          - id: java
-            dockerfile: docker/apps/java.Dockerfile
-          - id: ruby
-            dockerfile: docker/apps/ruby.Dockerfile
-          - id: browser
-            dockerfile: docker/apps/browser.Dockerfile
-          - id: demo-server
-            dockerfile: docker/apps/demo-server.Dockerfile
-          - id: pii-canary
-            dockerfile: docker/apps/pii-canary.Dockerfile
-          - id: rust
-            dockerfile: docker/apps/emitter.Dockerfile
-            build_arg: APP_ID=rust
-          - id: php
-            dockerfile: docker/apps/emitter.Dockerfile
-            build_arg: APP_ID=php
-          - id: dotnet
-            dockerfile: docker/apps/emitter.Dockerfile
-            build_arg: APP_ID=dotnet
-          - id: react-native
-            dockerfile: docker/apps/emitter.Dockerfile
-            build_arg: APP_ID=react-native
-          - id: serverless
-            dockerfile: docker/apps/emitter.Dockerfile
-            build_arg: APP_ID=serverless
     steps:
-      - uses: actions/checkout@v4
-      - run: echo "IMAGE_OWNER=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_ENV"
-      - uses: docker/setup-buildx-action@v3
-      - name: Log in to GHCR
+      - name: Trigger OwlPane/owlpane-sdk GHCR publish
         env:
-          GHCR_PUSH_TOKEN: ${{ secrets.GHCR_PUSH_TOKEN }}
+          GH_TOKEN: ${{ secrets.SDK_PUBLISH_DISPATCH_TOKEN }}
         run: |
-          token="${GHCR_PUSH_TOKEN:-${{ secrets.GITHUB_TOKEN }}}"
-          if [ -z "$token" ]; then
-            echo "::error::No GHCR token (set GHCR_PUSH_TOKEN or allow GITHUB_TOKEN packages:write)"
-            exit 1
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::notice::GHCR push runs from OwlPane/owlpane-sdk (packages linked there)."
+            echo "::notice::Set repo secret SDK_PUBLISH_DISPATCH_TOKEN (PAT: workflow on owlpane-sdk) or run:"
+            echo "  gh workflow run publish-sdk-example-images.yml -R OwlPane/owlpane-sdk -f sdk_version=${{ needs.meta.outputs.sdk_version }} -f wait_for_registries=true -f examples_ref=main"
+            exit 0
           fi
-          echo "$token" | docker login "${{ env.REGISTRY }}" -u "${{ github.repository_owner }}" --password-stdin
-      - name: Build and push sdk-example-${{ matrix.id }}
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ${{ matrix.dockerfile }}
-          push: true
-          platforms: linux/amd64
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_OWNER }}/sdk-example-${{ matrix.id }}:${{ needs.meta.outputs.version }}
-          build-args: |
-            SDK_VERSION=${{ needs.meta.outputs.sdk_version }}
-            ${{ matrix.build_arg }}
-          cache-from: type=gha,scope=${{ matrix.id }}
-          cache-to: type=gha,mode=max,scope=${{ matrix.id }}
-
-  gitops:
-    needs: [meta, build]
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          wget -qO /usr/local/bin/yq \
-            https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
-          chmod +x /usr/local/bin/yq
-      - uses: actions/checkout@v4
-        id: checkout_infra
-        continue-on-error: true
-        with:
-          repository: balaji-singh/seo-infra
-          path: seo-infra
-          token: ${{ secrets.GIT_TOKEN }}
-          fetch-depth: 1
-      - if: steps.checkout_infra.outcome == 'success'
-        working-directory: seo-infra
-        run: yq -i ".imageTag = \"${{ needs.meta.outputs.version }}\"" "${{ env.HELM_HETZNER }}"
-      - if: steps.checkout_infra.outcome == 'success'
-        working-directory: seo-infra
-        run: |
-          git config user.email "${{ env.GIT_EMAIL }}"
-          git config user.name "${{ env.GIT_USERNAME }}"
-          git add "${{ env.HELM_HETZNER }}"
-          git diff --staged --quiet || \
-            (git commit -m "chore(sdk-examples): imageTag ${{ needs.meta.outputs.version }}" && git push)
-      - name: Skip GitOps sync (missing GIT_TOKEN)
-        if: steps.checkout_infra.outcome != 'success'
-        run: echo "::warning::GIT_TOKEN missing — bump imageTag in seo-infra manually"
+          REF="${{ needs.meta.outputs.examples_ref }}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            REF="main"
+          fi
+          gh workflow run publish-sdk-example-images.yml -R OwlPane/owlpane-sdk \
+            -f "sdk_version=${{ needs.meta.outputs.sdk_version }}" \
+            -f "wait_for_registries=${{ github.event.inputs.wait_for_registries || 'true' }}" \
+            -f "examples_ref=${REF}"
