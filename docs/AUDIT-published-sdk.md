@@ -17,10 +17,10 @@
 
 ## Still on maintainers
 
-1. **Publish SDK `sdk-v0.1.9`** must finish before npm/PyPI and example Docker builds succeed.
-2. **`sdk/examples/`** tree may still exist on older **owlpane-sdk** branches — dogfood source of truth is the **public examples repo** only; delete legacy tree on SDK `main` when ready.
+1. ~~**Publish SDK `sdk-v0.1.9`**~~ — **done** (npm `@owlpane/node` / `@owlpane/browser`, PyPI `owlpane==0.1.9`, tag [`sdk-v0.1.9`](https://github.com/OwlPane/owlpane-sdk/releases/tag/sdk-v0.1.9); CI fix: vend `examples/_receiver` for conformance).
+2. **`sdk/examples/`** legacy tree on **owlpane-sdk** — dogfood source of truth is **owlpane-sdk-examples** only; trim SDK repo when ready.
 3. **seo-infra** `helm-charts/owlpane-sdk-examples/values-hetzner.yaml` **`imageTag`** updates via examples CI when **`GIT_TOKEN`** is set.
-4. **`SDK_EXAMPLES_DISPATCH_TOKEN`** on owlpane-sdk for automatic example image builds after publish.
+4. **`SDK_EXAMPLES_DISPATCH_TOKEN`** on owlpane-sdk for automatic example image builds after publish (optional; manual `workflow_dispatch` works).
 
 ## Verify
 
