@@ -1,0 +1,15 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate k8s / dogfood manifest
+        run: |
+          chmod +x scripts/validate-k8s-config.sh
+          ./scripts/validate-k8s-config.sh

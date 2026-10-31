@@ -1,4 +1,5 @@
-# GHCR image per example app. Pin tag in seo-infra helm-charts/owlpane-sdk-examples/values-hetzner.yaml.
+# Canonical GHCR pipeline for sdk-example-* images (moved from private owlpane-sdk).
+# Pins seo-infra helm-charts/owlpane-sdk-examples/values-hetzner.yaml imageTag when GIT_TOKEN is set.
 name: Publish SDK example images
 
 on:
@@ -7,15 +8,20 @@ on:
     paths:
       - "apps/**"
       - "docker/**"
+      - "pii-canary/**"
       - "sdk-published.version"
       - "dogfood.manifest.json"
       - "_lib/**"
-      - ".github/workflows/publish-example-images.yml"
+      - ".github/workflows/publish-sdk-example-images.yml"
   workflow_dispatch:
     inputs:
       sdk_version:
         description: Published @owlpane/node version (default sdk-published.version)
         required: false
+      wait_for_registries:
+        description: Wait for npm/PyPI before building (after sdk-v* release)
+        type: boolean
+        default: false
   repository_dispatch:
     types: [sdk-published]
 
@@ -37,6 +43,9 @@ jobs:
       sdk_version: ${{ steps.meta.outputs.sdk_version }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
       - id: meta
         run: |
           SDK_VERSION="${{ github.event.inputs.sdk_version }}"
@@ -45,6 +54,16 @@ jobs:
           fi
           if [ -z "$SDK_VERSION" ]; then
             SDK_VERSION="$(tr -d ' \n\r' < sdk-published.version)"
+          fi
+          WAIT="${{ github.event.inputs.wait_for_registries }}"
+          if [ "$WAIT" = "true" ] || [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            echo "Waiting for @owlpane/node@${SDK_VERSION} on npm and owlpane on PyPI..."
+            for i in $(seq 1 36); do
+              npm view "@owlpane/node@${SDK_VERSION}" version >/dev/null 2>&1 || { sleep 10; continue; }
+              curl -fsSL "https://pypi.org/pypi/owlpane/json" | grep -q "\"${SDK_VERSION}\"" || { sleep 10; continue; }
+              echo "Registries ready after ${i} attempt(s)"
+              break
+            done
           fi
           SHA="$(git rev-parse HEAD)"
           VERSION="$(date -u +'%Y.%m.%d')-${GITHUB_RUN_NUMBER}-$(echo "$SHA" | cut -c1-7)"
@@ -109,8 +128,6 @@ jobs:
           build-args: |
             SDK_VERSION=${{ needs.meta.outputs.sdk_version }}
             ${{ matrix.build_arg }}
-          secrets: |
-            github_token=${{ secrets.GITHUB_TOKEN }}
           cache-from: type=gha,scope=${{ matrix.id }}
           cache-to: type=gha,mode=max,scope=${{ matrix.id }}
 
@@ -141,3 +158,6 @@ jobs:
           git add "${{ env.HELM_HETZNER }}"
           git diff --staged --quiet || \
             (git commit -m "chore(sdk-examples): imageTag ${{ needs.meta.outputs.version }}" && git push)
+      - name: Skip GitOps sync (missing GIT_TOKEN)
+        if: steps.checkout_infra.outcome != 'success'
+        run: echo "::warning::GIT_TOKEN missing — bump imageTag in seo-infra manually"

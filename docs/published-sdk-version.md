@@ -1,20 +1,17 @@
 # Published SDK version for examples
 
-**Registry truth:** npm / PyPI / Go module tags ship on **`sdk-v*`** releases via `.github/workflows/publish-sdk.yml`.
+**Registry truth:** npm / PyPI ship on **`sdk-v*`** releases from the private **[owlpane-sdk](https://github.com/OwlPane/owlpane-sdk)** repo (`Publish SDK` workflow).
 
-**Single pin** (cluster images + `OWLPANE_SDK_SOURCE=published`):
+**Pin for Docker / `OWLPANE_SDK_SOURCE=published`:**
 
 ```text
-examples/sdk-published.version   → 0.1.8
+sdk-published.version   → 0.1.8
 ```
 
-Cut a release:
+After a new SDK release:
 
-```bash
-git tag sdk-v$(tr -d ' \n' < examples/sdk-published.version)
-git push origin "sdk-v$(tr -d ' \n' < examples/sdk-published.version)"
-```
+1. Set **`sdk-published.version`** to the released version and push **`main`** here.
+2. **Publish SDK example images** runs automatically (`.github/workflows/publish-sdk-example-images.yml`).
+3. Or trigger from **owlpane-sdk** after `sdk-v*` (needs **`SDK_EXAMPLES_DISPATCH_TOKEN`** on the SDK repo) — waits for npm/PyPI, then builds GHCR **`sdk-example-*`** images.
 
-After registries have **0.1.8**, run **Publish SDK example images** (or push `examples/**` to `main`).
-
-Local dev against workspace SDKs: monorepo dogfood **defaults to** `OWLPANE_SDK_SOURCE=local` when `sdk/packages/node` exists (`scripts/_lib/dogfood-sdk-source.sh`). Override with `OWLPANE_SDK_SOURCE=published` to match cluster pins. Python/Go use existing `replace` / `-e` paths in `requirements.txt` / `go.mod`.
+Local dev uses published npm/PyPI only (no monorepo `file:` links in this repo).
