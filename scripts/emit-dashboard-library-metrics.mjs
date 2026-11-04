@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Emit synthetic gauge metrics named like OpenObserve library dashboards (Redis, K8s nodes, etc.)
+ * Emit synthetic gauge metrics named like the library dashboards (Redis, K8s nodes, etc.)
  * so installed dashboards show charts in local/SaaS dogfood. Uses examples/.env ingest key (node project).
  *
  *   node scripts/emit-dashboard-library-metrics.mjs
