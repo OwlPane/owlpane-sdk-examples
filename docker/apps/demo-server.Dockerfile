@@ -1,6 +1,7 @@
-FROM node:22-alpine
+FROM node:22-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914
 ARG SDK_VERSION
 RUN apk add --no-cache tini bash
+RUN addgroup -S -g 10001 app && adduser -S -u 10001 -G app -h /home/app app
 WORKDIR /app
 COPY sdk-published.version ./sdk-published.version
 COPY _lib ./_lib
@@ -13,6 +14,10 @@ COPY apps/demo-server/run.sh ./apps/demo-server/
 RUN SDK_V="$(/docker/resolve-sdk-version.sh)" \
   && chmod +x apps/demo-server/run.sh \
   && /docker/npm-install-published-node.sh "${SDK_V}" apps/demo-server
+# Run as an unprivileged user; the entrypoint writes only under /app and $HOME.
+RUN chown -R 10001:10001 /app
+USER 10001:10001
+ENV HOME=/home/app
 ENV NODE_ENV=production \
     OWLPANE_DOGFOOD_APP_ID=demo-server \
     OWLPANE_EXAMPLE_MODE=server \
