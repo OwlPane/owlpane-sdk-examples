@@ -38,7 +38,7 @@ jobs:
           echo "${GITLEAKS_SHA256}  gitleaks.tgz" | sha256sum -c -
           tar xzf gitleaks.tgz gitleaks
       - name: Scan history
-        run: ./gitleaks detect --source . --config .gitleaks.toml --redact --no-banner --exit-code 1
+        run: ./gitleaks detect --source . --config .gitleaks.toml --redact --verbose --no-banner --exit-code 1
 
   codeql:
     name: CodeQL (${{ matrix.language }})
@@ -68,7 +68,9 @@ jobs:
 
   dependency-review:
     name: Dependency review
-    if: ${{ github.event_name == 'pull_request' && (!github.event.repository.private || vars.GHAS_ENABLED == 'true') }}
+    # Needs the repository's Dependency graph enabled (Settings > Security); set repo variable
+    # DEPENDENCY_REVIEW_ENABLED=true once it is, plus GHAS_ENABLED=true on private repositories.
+    if: ${{ github.event_name == 'pull_request' && vars.DEPENDENCY_REVIEW_ENABLED == 'true' && (!github.event.repository.private || vars.GHAS_ENABLED == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
