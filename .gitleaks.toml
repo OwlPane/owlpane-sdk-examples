@@ -8,7 +8,7 @@ useDefault = true
 description = "Placeholder keys used in examples and tests"
 regexes = [
   '''AKIAIOSFODNN7EXAMPLE''',
-  '''owl_ing_0{8,}''',
+  '''owl_ing_(0{16,}|(0123456789abcdef){2,})''',
 ]
 paths = [
   '''(^|/)package-lock\.json$''',
