@@ -11,3 +11,6 @@ apps/ruby/.bundle
 pii-canary/node_modules
 sdk-*/
 apps/demo-server/node_modules
+
+# Local agent-tool state; never commit (audit SC-33)
+.clawness/
