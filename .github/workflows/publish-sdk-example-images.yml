@@ -31,45 +31,69 @@ permissions:
 jobs:
   meta:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       sdk_version: ${{ steps.meta.outputs.sdk_version }}
       examples_ref: ${{ steps.meta.outputs.examples_ref }}
+      wait: ${{ steps.meta.outputs.wait }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
       - id: meta
+        # Dispatch inputs reach the shell only through env and are validated before use.
+        env:
+          IN_SDK_VERSION: ${{ inputs.sdk_version || github.event.client_payload.sdk_version }}
+          IN_WAIT: ${{ inputs.wait_for_registries }}
         run: |
-          SDK_VERSION="${{ github.event.inputs.sdk_version }}"
-          if [ -z "$SDK_VERSION" ] && [ -n "${{ github.event.client_payload.sdk_version }}" ]; then
-            SDK_VERSION="${{ github.event.client_payload.sdk_version }}"
-          fi
+          set -euo pipefail
+          SDK_VERSION="${IN_SDK_VERSION:-}"
           if [ -z "$SDK_VERSION" ]; then
             SDK_VERSION="$(tr -d ' \n\r' < sdk-published.version)"
           fi
+          if ! [[ "$SDK_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.]+)?$ ]]; then
+            echo "::error::sdk_version must be a semver such as 1.2.3"
+            exit 1
+          fi
+          WAIT="${IN_WAIT:-}"
+          if [ -n "$WAIT" ] && ! [[ "$WAIT" =~ ^(true|false)$ ]]; then
+            echo "::error::wait_for_registries must be true or false"
+            exit 1
+          fi
           echo "sdk_version=$SDK_VERSION" >> "$GITHUB_OUTPUT"
           echo "examples_ref=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          echo "wait=${WAIT:-true}" >> "$GITHUB_OUTPUT"
 
   trigger-sdk-publish:
     needs: meta
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Trigger OwlPane/owlpane-sdk GHCR publish
         env:
           GH_TOKEN: ${{ secrets.SDK_PUBLISH_DISPATCH_TOKEN }}
+          SDK_VERSION: ${{ needs.meta.outputs.sdk_version }}
+          WAIT: ${{ needs.meta.outputs.wait }}
+          META_REF: ${{ needs.meta.outputs.examples_ref }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
+          set -euo pipefail
           if [ -z "$GH_TOKEN" ]; then
             echo "::notice::GHCR push runs from OwlPane/owlpane-sdk (packages linked there)."
             echo "::notice::Set repo secret SDK_PUBLISH_DISPATCH_TOKEN (PAT: workflow on owlpane-sdk) or run:"
-            echo "  gh workflow run publish-sdk-example-images.yml -R OwlPane/owlpane-sdk -f sdk_version=${{ needs.meta.outputs.sdk_version }} -f wait_for_registries=true -f examples_ref=main"
+            echo "  gh workflow run publish-sdk-example-images.yml -R OwlPane/owlpane-sdk -f sdk_version=${SDK_VERSION} -f wait_for_registries=true -f examples_ref=main"
             exit 0
           fi
-          REF="${{ needs.meta.outputs.examples_ref }}"
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+          REF="$META_REF"
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] || [ "$EVENT_NAME" = "repository_dispatch" ]; then
             REF="main"
           fi
           gh workflow run publish-sdk-example-images.yml -R OwlPane/owlpane-sdk \
-            -f "sdk_version=${{ needs.meta.outputs.sdk_version }}" \
-            -f "wait_for_registries=${{ github.event.inputs.wait_for_registries || 'true' }}" \
+            -f "sdk_version=${SDK_VERSION}" \
+            -f "wait_for_registries=${WAIT}" \
             -f "examples_ref=${REF}"
