@@ -4,11 +4,18 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check actions are pinned to commit SHAs
+        run: bash scripts/check-pinned-actions.sh
       - name: Validate k8s / dogfood manifest
         run: |
           chmod +x scripts/validate-k8s-config.sh

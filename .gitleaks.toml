@@ -1,0 +1,16 @@
+# Extends the default ruleset; only documented placeholder values are allowlisted.
+title = "OwlPane gitleaks"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Placeholder keys used in examples and tests"
+regexes = [
+  '''AKIAIOSFODNN7EXAMPLE''',
+  '''owl_ing_(0{16,}|(0123456789abcdef){2,})''',
+]
+paths = [
+  '''(^|/)package-lock\.json$''',
+  '''(^|/)pnpm-lock\.yaml$''',
+]
