@@ -24,12 +24,18 @@ const {
 
 process.env.OWLPANE_METRICS_EXPORT_INTERVAL_MS ??= "3000";
 
+const appId = process.env.OWLPANE_DOGFOOD_APP_ID ?? "node";
+
 owlpane.start({
   service: process.env.OTEL_SERVICE_NAME,
   endpoint: process.env.OWLPANE_INGEST_URL ?? process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
   ingestKey: process.env.OWLPANE_INGEST_KEY,
   environment: process.env.OWLPANE_ENVIRONMENT,
   release: process.env.OWLPANE_SERVICE_VERSION ?? process.env.OWLPANE_SDK_VERSION,
+  // This process is Node even when it pretends to be PHP, .NET, or a browser.
+  // Leave V8 heap and the event loop to the Node example; those runtimes have neither.
+  disableInstrumentations:
+    appId === "node" ? undefined : ["@opentelemetry/instrumentation-runtime-node"],
 });
 
 if (!isEnabled()) {
@@ -37,7 +43,6 @@ if (!isEnabled()) {
   process.exit(1);
 }
 
-const appId = process.env.OWLPANE_DOGFOOD_APP_ID ?? "node";
 const rich = process.env.OWLPANE_DOGFOOD_MODE === "rich" || process.argv.includes("--rich");
 const tracer = trace.getTracer("owlpane-dogfood");
 const meter = metrics.getMeter("owlpane-dogfood");
