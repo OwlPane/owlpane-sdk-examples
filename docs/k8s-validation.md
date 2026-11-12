@@ -15,7 +15,8 @@ Run before enabling `owlpane-sdk-examples`:
 | python | PyPI `owlpane` | rich | — | — | |
 | java | OTel javaagent + App | rich | JVM runtime | — | agent pinned `v2.14.0` |
 | ruby | OTLP + app | rich | `metrics.rb` | — | |
-| rust/php/dotnet/rn/serverless | `@owlpane/node` emitter | rich + language attrs | — | — | |
+| rust | OTel Rust + OTLP HTTP | one server span | one counter | one heartbeat log | repeated by the entrypoint interval |
+| php/dotnet/rn/serverless | `@owlpane/node` emitter | rich + language attrs | — | — | |
 | demo-server | `@owlpane/node` continuous | traces/metrics/logs | HTTP :4399 | |
 | browser | `@owlpane/browser` | RUM | — | — | **disabled in cluster** |
 | pii-canary | `@owlpane/node` | + synthetic PII logs | — | scrub test | env **`piiCanaryEnvironment`** (not prod) |

@@ -4,6 +4,7 @@ apps/node/node_modules
 apps/node/.npmrc
 apps/python/.venv
 apps/go/go.sum
+apps/rust/target
 apps/java/lib
 apps/java/out
 apps/ruby/vendor

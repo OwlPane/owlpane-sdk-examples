@@ -1,0 +1,16 @@
+[package]
+name = "owlpane-dogfood-rust"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+opentelemetry = "=0.33.1"
+opentelemetry_sdk = "=0.33.1"
+opentelemetry-otlp = { version = "=0.33.1", default-features = false, features = [
+  "http-proto",
+  "reqwest-blocking-client",
+  "trace",
+  "metrics",
+  "logs",
+] }

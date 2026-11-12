@@ -41,7 +41,7 @@ echo "==> dogfood-env (python3-only, no node on PATH)"
 echo "==> Dockerfiles for each manifest app (except disabled browser)"
 for id in $MANIFEST_IDS; do
   if [[ "$id" == "browser" ]]; then continue; fi
-  if [[ "$id" == "demo-server" || "$id" == "pii-canary" || "$id" == "node" || "$id" == "go" || "$id" == "python" || "$id" == "java" || "$id" == "ruby" ]]; then
+  if [[ "$id" == "demo-server" || "$id" == "pii-canary" || "$id" == "node" || "$id" == "go" || "$id" == "python" || "$id" == "java" || "$id" == "ruby" || "$id" == "rust" ]]; then
     f="$ROOT/docker/apps/${id}.Dockerfile"
   else
     f="$ROOT/docker/apps/emitter.Dockerfile"

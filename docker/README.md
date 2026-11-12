@@ -4,7 +4,7 @@ One **image per** `dogfood.manifest.json` app. Argo CD app **`owlpane-sdk-exampl
 
 | App id | Dockerfile |
 |--------|------------|
-| node, go, python, java, ruby, browser, demo-server, pii-canary | `apps/<id>.Dockerfile` |
-| rust, php, dotnet, react-native, serverless | `apps/emitter.Dockerfile` + `APP_ID` |
+| node, go, python, java, ruby, rust, browser, demo-server, pii-canary | `apps/<id>.Dockerfile` |
+| php, dotnet, react-native, serverless | `apps/emitter.Dockerfile` + `APP_ID` |
 
 Build context is always the **`owlpane/sdk` repo root**. CI: `.github/workflows/publish-sdk-examples.yml`.

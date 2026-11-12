@@ -16,7 +16,7 @@ In the console, create **one project per app** (names must match `dogfood.manife
 | `owlpane-sdk-python` | [`apps/python`](apps/python) | `owlpane` (PyPI; align with published SDK release) |
 | `owlpane-sdk-java` | [`apps/java`](apps/java) | OpenTelemetry **javaagent** + `OTEL_*` env |
 | `owlpane-sdk-ruby` | [`apps/ruby`](apps/ruby) | `opentelemetry-sdk` + OTLP exporter |
-| `owlpane-sdk-rust` | [`apps/rust`](apps/rust) | OTLP via shared [`_lib/dogfood-rich-emit.mjs`](_lib/dogfood-rich-emit.mjs) |
+| `owlpane-sdk-rust` | [`apps/rust`](apps/rust) | OTel Rust + OTLP HTTP (`opentelemetry-otlp`) |
 | `owlpane-sdk-php` | [`apps/php`](apps/php) | Laravel-style spans + OTLP (shared emitter) |
 | `owlpane-sdk-dotnet` | [`apps/dotnet`](apps/dotnet) | .NET runtime metrics + OTLP (shared emitter) |
 | `owlpane-sdk-react-native` | [`apps/react-native`](apps/react-native) | Mobile-style spans + `telemetry.sdk.language=react-native` (shared emitter) |
