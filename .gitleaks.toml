@@ -1,0 +1,14 @@
+title = "owlpane-sdk-examples"
+
+[extend]
+useDefault = true
+
+# Exact local-receiver placeholder only. Do not add a path allowlist or an
+# owl_ing_ prefix rule: ingest keys are owl_ing_ plus 48 hex digits, and those
+# must still match.
+[allowlist]
+description = "Local conformance receiver placeholder"
+regexTarget = "secret"
+regexes = [
+  '''^owl_ing_EXAMPLE$''',
+]

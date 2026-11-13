@@ -1,5 +1,7 @@
 /**
- * Emits intentional PII-shaped telemetry to verify Owlpane ingest scrub + API read redaction.
+ * Emits email, card, bearer, and SQL-shaped fixtures.
+ * The API redacts those shapes when telemetry text is shown or exported.
+ * This process sends the fixture strings as written.
  * Requires OWLPANE_ENDPOINT and OWLPANE_INGEST_KEY for a dedicated "pii-canary" project.
  */
 import { createServer } from "node:http";

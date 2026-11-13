@@ -35,7 +35,7 @@ jobs:
       sdk_version: ${{ steps.meta.outputs.sdk_version }}
       examples_ref: ${{ steps.meta.outputs.examples_ref }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: 22
