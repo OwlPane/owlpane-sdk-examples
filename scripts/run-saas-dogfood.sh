@@ -57,7 +57,7 @@ cat <<EOF
   ${CONSOLE}/observability/explorer        — owlpane.dogfood.requests
 
 Optional:
-  ./pii-canary/run.sh                      — PII scrub verification (service pii-canary)
+  ./pii-canary/run.sh                      — PII-shaped fixtures (service pii-canary)
   ./scripts/run-saas-dogfood.sh --loop-demo  — steady charts via owlpane-demo-server
 
 ==> Kubernetes + infrastructure (not from SDK examples)

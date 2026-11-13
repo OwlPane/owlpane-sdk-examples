@@ -9,7 +9,7 @@ trap 'kill $RPID 2>/dev/null || true' EXIT
 until [ -s "$PORTFILE" ]; do sleep 0.2; done
 PORT=$(cat "$PORTFILE")
 curl -sf -X POST "http://127.0.0.1:${PORT}/v1/traces" \
-  -H "Authorization: Bearer owl_ing_test_local_key" \
+  -H "Authorization: Bearer owl_ing_EXAMPLE" \
   -H "content-type: application/json" \
   -d '{"resourceSpans":[{"resource":{"attributes":[{"key":"service.name","value":{"stringValue":"node-example"}},{"key":"deployment.environment.name","value":{"stringValue":"production"}},{"key":"service.version","value":{"stringValue":"1.0.0"}}]},"scopeSpans":[{"spans":[{"name":"hello-owlpane"}]}]}]}' >/dev/null
 wait $RPID

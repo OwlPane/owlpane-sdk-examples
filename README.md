@@ -51,7 +51,7 @@ Copy [`.env.saas.example`](.env.saas.example) to `.env`. Set **`OWLPANE_INGEST_U
 chmod +x scripts/run-saas-dogfood.sh scripts/onboard-dogfood.sh run-dogfood.sh
 ./scripts/run-saas-dogfood.sh              # onboard + one rich burst (8 projects incl. demo + PII)
 ./scripts/run-saas-dogfood.sh --loop-demo  # continuous load for Home charts
-./pii-canary/run.sh                        # optional PII scrub stream
+./pii-canary/run.sh                        # optional PII-shaped fixtures (read-path check)
 ```
 
 **What this covers:** OTLP from all SDK runtimes, browser RUM, `owlpane-demo-server`, and project **`pii-canary`** (onboarded via `dogfood.manifest.json`).
@@ -180,5 +180,5 @@ See [on-call-app/README.md](../../on-call-app/README.md) and [OBSERVE-IMPLEMENTA
 |------|---------|
 | [`apps/demo-server/`](apps/demo-server/) | Continuous HTTP + interval load generator emitting traces, metrics, and logs |
 | [`conformance/`](conformance/) | Plain OTel samples + `_receiver` for CI/docs (no real ingest) |
-| [`pii-canary/`](pii-canary/) | PII scrub verification against a live ingest |
+| [`pii-canary/`](pii-canary/) | Emits PII-shaped fixtures so you can compare stored text with search redaction |
 | [`_receiver/`](_receiver/) | Throwaway OTLP receiver used by package conformance tests |
