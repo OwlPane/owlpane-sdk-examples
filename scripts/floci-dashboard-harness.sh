@@ -18,7 +18,7 @@ mkdir -p "$STATE_DIR"
 
 need_floci() {
   if ! command -v floci >/dev/null 2>&1; then
-    echo "Install Floci CLI: scripts/install-floci-local.sh (pinned and checksum-verified)" >&2
+    echo "Install Floci CLI (pinned + checksum-verified): bash scripts/install-floci-local.sh" >&2
     echo "Docs: https://floci.io/" >&2
     exit 1
   fi

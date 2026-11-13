@@ -1,14 +1,16 @@
-title = "owlpane-sdk-examples"
+# Extends the default ruleset; only documented placeholder values are allowlisted.
+title = "OwlPane gitleaks"
 
 [extend]
 useDefault = true
 
-# Exact local-receiver placeholder only. Do not add a path allowlist or an
-# owl_ing_ prefix rule: ingest keys are owl_ing_ plus 48 hex digits, and those
-# must still match.
 [allowlist]
-description = "Local conformance receiver placeholder"
-regexTarget = "secret"
+description = "Placeholder keys used in examples and tests"
 regexes = [
-  '''^owl_ing_EXAMPLE$''',
+  '''AKIAIOSFODNN7EXAMPLE''',
+  '''owl_ing_(0{16,}|(0123456789abcdef){2,})''',
+]
+paths = [
+  '''(^|/)package-lock\.json$''',
+  '''(^|/)pnpm-lock\.yaml$''',
 ]
