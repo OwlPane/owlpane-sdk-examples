@@ -1,6 +1,7 @@
 {
   "name": "iot-device-simulator",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "start": "node --import tsx src/simulator.ts"

@@ -20,7 +20,7 @@ concurrency:
 jobs:
   gitleaks:
     name: Secret scan
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, local]
     timeout-minutes: 10
     permissions:
       contents: read
@@ -44,7 +44,7 @@ jobs:
     name: CodeQL (${{ matrix.language }})
     # Code scanning on private repositories needs GitHub Advanced Security; set repo variable GHAS_ENABLED=true.
     if: ${{ !github.event.repository.private || vars.GHAS_ENABLED == 'true' }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, local]
     timeout-minutes: 30
     permissions:
       contents: read
@@ -71,7 +71,7 @@ jobs:
     # Needs the repository's Dependency graph enabled (Settings > Security); set repo variable
     # DEPENDENCY_REVIEW_ENABLED=true once it is, plus GHAS_ENABLED=true on private repositories.
     if: ${{ github.event_name == 'pull_request' && vars.DEPENDENCY_REVIEW_ENABLED == 'true' && (!github.event.repository.private || vars.GHAS_ENABLED == 'true') }}
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, local]
     timeout-minutes: 10
     permissions:
       contents: read

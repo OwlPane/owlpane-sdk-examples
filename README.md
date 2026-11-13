@@ -16,7 +16,7 @@ In the console, create **one project per app** (names must match `dogfood.manife
 | `owlpane-sdk-python` | [`apps/python`](apps/python) | `owlpane` (PyPI; align with published SDK release) |
 | `owlpane-sdk-java` | [`apps/java`](apps/java) | OpenTelemetry **javaagent** + `OTEL_*` env |
 | `owlpane-sdk-ruby` | [`apps/ruby`](apps/ruby) | `opentelemetry-sdk` + OTLP exporter |
-| `owlpane-sdk-rust` | [`apps/rust`](apps/rust) | OTLP via shared [`_lib/dogfood-rich-emit.mjs`](_lib/dogfood-rich-emit.mjs) |
+| `owlpane-sdk-rust` | [`apps/rust`](apps/rust) | OTel Rust + OTLP HTTP (`opentelemetry-otlp`) |
 | `owlpane-sdk-php` | [`apps/php`](apps/php) | Laravel-style spans + OTLP (shared emitter) |
 | `owlpane-sdk-dotnet` | [`apps/dotnet`](apps/dotnet) | .NET runtime metrics + OTLP (shared emitter) |
 | `owlpane-sdk-react-native` | [`apps/react-native`](apps/react-native) | Mobile-style spans + `telemetry.sdk.language=react-native` (shared emitter) |
@@ -51,7 +51,7 @@ Copy [`.env.saas.example`](.env.saas.example) to `.env`. Set **`OWLPANE_INGEST_U
 chmod +x scripts/run-saas-dogfood.sh scripts/onboard-dogfood.sh run-dogfood.sh
 ./scripts/run-saas-dogfood.sh              # onboard + one rich burst (8 projects incl. demo + PII)
 ./scripts/run-saas-dogfood.sh --loop-demo  # continuous load for Home charts
-./pii-canary/run.sh                        # optional PII scrub stream
+./pii-canary/run.sh                        # optional PII-shaped fixtures (read-path check)
 ```
 
 **What this covers:** OTLP from all SDK runtimes, browser RUM, `owlpane-demo-server`, and project **`pii-canary`** (onboarded via `dogfood.manifest.json`).
@@ -180,5 +180,5 @@ See [on-call-app/README.md](../../on-call-app/README.md) and [OBSERVE-IMPLEMENTA
 |------|---------|
 | [`apps/demo-server/`](apps/demo-server/) | Continuous HTTP + interval load generator emitting traces, metrics, and logs |
 | [`conformance/`](conformance/) | Plain OTel samples + `_receiver` for CI/docs (no real ingest) |
-| [`pii-canary/`](pii-canary/) | PII scrub verification against a live ingest |
+| [`pii-canary/`](pii-canary/) | Emits PII-shaped fixtures so you can compare stored text with search redaction |
 | [`_receiver/`](_receiver/) | Throwaway OTLP receiver used by package conformance tests |

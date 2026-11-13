@@ -135,6 +135,12 @@ if (richMode) {
   );
 }
 
+// Event-loop delay needs a few monitorEventLoopDelay samples before it exports.
+const metricsSleepSec = Number(process.env.OWLPANE_DOGFOOD_METRICS_SLEEP_SEC ?? "6");
+if (Number.isFinite(metricsSleepSec) && metricsSleepSec > 0) {
+  await new Promise((r) => setTimeout(r, metricsSleepSec * 1000));
+}
+
 await shutdown();
 console.log(
   `span${richMode ? " + metrics + logs" : ""} emitted (${process.env.OTEL_SERVICE_NAME})`,

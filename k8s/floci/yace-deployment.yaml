@@ -29,7 +29,8 @@ spec:
     spec:
       containers:
         - name: yace
-          image: quay.io/prometheuscommunity/yet-another-cloudwatch-exporter:latest
+          # Pinned to v0.68.0 by digest (was :latest, which can change under a running deployment).
+          image: quay.io/prometheuscommunity/yet-another-cloudwatch-exporter:v0.68.0@sha256:651b4041d9c3289f7766fac755127fe610ed7857c6dec687dc66015b7ac987be
           args:
             - --config.file=/config/config.yml
             - --listen-address=:5000
