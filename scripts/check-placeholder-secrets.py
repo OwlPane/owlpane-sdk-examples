@@ -90,7 +90,12 @@ def allowlist_is_tight() -> None:
         if compiled.search(realistic):
             print(f"allowlist matches a realistic ingest key: {pattern}", file=sys.stderr)
             sys.exit(1)
-        if pattern != r"^owl_ing_EXAMPLE$":
+        if pattern not in (
+            r"^owl_ing_EXAMPLE$",
+            # Documented dogfood placeholders in scripts/validate-k8s-config.sh; exact matches only.
+            r"^owl_ing_0{48}$",
+            r"^owl_ing_(0123456789abcdef){3}$",
+        ):
             print(f"unexpected allowlist regex: {pattern}", file=sys.stderr)
             sys.exit(1)
 
