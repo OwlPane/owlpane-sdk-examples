@@ -1,0 +1,17 @@
+{
+  "name": "owlpane-lake-bench",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "D-14 lake benchmark harness: load generator, query p95 gate, R2 latency probe. No dependencies.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "smoke": "node smoke.mjs 60s",
+    "load": "node loadgen.mjs",
+    "query": "node query-bench.mjs",
+    "r2": "node r2-probe.mjs"
+  }
+}
