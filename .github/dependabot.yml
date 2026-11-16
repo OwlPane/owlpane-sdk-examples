@@ -1,0 +1,111 @@
+# Dependency update PRs. Security updates are separate and enabled in repository settings.
+version: 2
+updates:
+- package-ecosystem: github-actions
+  directory: /
+  schedule:
+    interval: weekly
+  groups:
+    actions:
+      patterns:
+      - '*'
+- package-ecosystem: bundler
+  directory: /apps/ruby
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 5
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch
+- package-ecosystem: gomod
+  directory: /apps/go
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 5
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch
+- package-ecosystem: gomod
+  directory: /conformance/go
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 5
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch
+- package-ecosystem: npm
+  directory: /apps/browser
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 5
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch
+- package-ecosystem: npm
+  directory: /apps/demo-server
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 5
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch
+- package-ecosystem: npm
+  directory: /apps/iot-device-simulator
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 5
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch
+- package-ecosystem: npm
+  directory: /apps/node
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 5
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch
+- package-ecosystem: npm
+  directory: /pii-canary
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 5
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch
+- package-ecosystem: pip
+  directory: /apps/python
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 5
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch
+- package-ecosystem: pip
+  directory: /conformance/python
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 5
+  groups:
+    minor-and-patch:
+      update-types:
+      - minor
+      - patch

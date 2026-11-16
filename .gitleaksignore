@@ -1,0 +1,2 @@
+# Reviewed false positive: 22-character test value (real keys are 56 characters) sent to a mock receiver on 127.0.0.1.
+4014a562c82f2540b76eb69597e41bc5ff856fa4:conformance/node/run.sh:curl-auth-header:11
