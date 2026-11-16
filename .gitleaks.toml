@@ -11,6 +11,7 @@ description = "Local conformance receiver placeholder"
 regexTarget = "secret"
 regexes = [
   '''^owl_ing_EXAMPLE$''',
-  # 48 zero digits: the documented dogfood placeholder in scripts/validate-k8s-config.sh, not a credential.
+  # Documented dogfood placeholders in scripts/validate-k8s-config.sh, not credentials.
   '''^owl_ing_0{48}$''',
+  '''^owl_ing_(0123456789abcdef){3}$''',
 ]
