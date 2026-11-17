@@ -11,6 +11,6 @@
     "@opentelemetry/api-logs": "^0.57.0",
     "@owlpane/node": "*",
     "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   }
 }
