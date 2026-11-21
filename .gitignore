@@ -15,6 +15,3 @@ apps/demo-server/node_modules
 
 # local agent tooling state; never commit
 .clawness/
-
-# lake benchmark output (scripts/benchmarks/lake)
-scripts/benchmarks/lake/reports/
