@@ -11,6 +11,19 @@ from opentelemetry.sdk.resources import Resource
 from journey import emit_journeys
 
 
+def depth(spans) -> int:
+    parent = {s.context.span_id: (s.parent.span_id if s.parent else None) for s in spans}
+
+    def level(span_id):
+        n = 0
+        while span_id is not None:
+            n += 1
+            span_id = parent.get(span_id)
+        return n
+
+    return max(level(i) for i in parent)
+
+
 class JourneyTest(unittest.TestCase):
     def setUp(self):
         self.exporter = InMemorySpanExporter()
@@ -34,8 +47,9 @@ class JourneyTest(unittest.TestCase):
         full = [s for s in self.traces.values() if not any(x.status.status_code.name == "ERROR" for x in s)]
         self.assertTrue(full)
         for spans in full:
-            self.assertGreaterEqual(len(spans), 16)
-            self.assertEqual({s.resource.attributes["service.name"] for s in spans}, {"owlpane-sdk-python", "dogfood-cart", "dogfood-inventory", "dogfood-payments", "dogfood-notify"})
+            self.assertGreaterEqual(len(spans), 20)
+            self.assertEqual({s.resource.attributes["service.name"] for s in spans}, {"owlpane-sdk-python", "dogfood-cart", "dogfood-inventory", "dogfood-payments", "dogfood-ledger", "dogfood-notify"})
+            self.assertGreaterEqual(depth(spans), 7)
 
     def test_slow_checkouts_mostly_use_one_provider_and_some_fail(self):
         roots = [s for s in self.spans if s.name == "POST /checkout"]
