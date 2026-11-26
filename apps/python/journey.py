@@ -1,4 +1,4 @@
-"""A storefront checkout as one distributed trace: web -> cart, inventory, payments -> notifications, 16+ spans.
+"""A storefront checkout as one distributed trace: web -> cart, inventory, payments -> ledger, notifications; 20+ spans, 7 levels deep.
 
 Spans carry explicit start and end times, so a batch of journeys is emitted at once with realistic durations. One payment provider
 is slow on purpose and out-of-stock items fail the request, so latency and error views have a real pattern to find.
@@ -14,7 +14,7 @@ from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.trace import SpanKind, Status, StatusCode
 
 MS = 1_000_000
-SERVICES = ("dogfood-cart", "dogfood-inventory", "dogfood-payments", "dogfood-notify")
+SERVICES = ("dogfood-cart", "dogfood-inventory", "dogfood-payments", "dogfood-ledger", "dogfood-notify")
 
 
 def service_tracers(base: trace.TracerProvider) -> dict:
@@ -100,7 +100,18 @@ def journey(t: Timeline, rng: random.Random, start: int) -> None:
             def pay_server(s, b):
                 b = t.span("dogfood-payments", "fraud score", b, rng.uniform(3, 9), parent=s, attrs={"user.tier": user_tier})
                 gateway = rng.uniform(600, 1500) if slow_payment else rng.uniform(40, 140)
-                return t.span("dogfood-payments", f"POST {provider}", b, gateway, SpanKind.CLIENT, {"http.request.method": "POST", "server.address": f"api.{provider}.example", "payment.provider": provider}, s)
+                b = t.span("dogfood-payments", f"POST {provider}", b, gateway, SpanKind.CLIENT, {"http.request.method": "POST", "server.address": f"api.{provider}.example", "payment.provider": provider}, s)
+
+                def ledger_client(lc, la):
+                    def ledger_server(ls, lb):
+                        def write_entry(w, wb):
+                            wb = t.span("dogfood-ledger", "SELECT ... FOR UPDATE accounts", wb, rng.uniform(1, 3), SpanKind.CLIENT, {"db.system": "postgresql", "db.operation.name": "SELECT", "db.collection.name": "accounts"}, w)
+                            return t.span("dogfood-ledger", "INSERT ledger_entries", wb, rng.uniform(2, 5), SpanKind.CLIENT, {"db.system": "postgresql", "db.operation.name": "INSERT", "db.collection.name": "ledger_entries"}, w)
+                        lb = t.span("dogfood-ledger", "write double entry", lb, 1, parent=ls, attrs={"ledger.lines": 2}, children=write_entry)
+                        return t.span("dogfood-ledger", "INSERT audit_log", lb, rng.uniform(1, 2), SpanKind.CLIENT, {"db.system": "postgresql", "db.operation.name": "INSERT", "db.collection.name": "audit_log"}, ls)
+                    return t.span("dogfood-ledger", "POST /entries", la + MS // 2, 1, SpanKind.SERVER, {"http.request.method": "POST", "http.route": "/entries", "http.response.status_code": 201}, lc, ledger_server)
+
+                return t.span("dogfood-payments", "POST dogfood-ledger", b, 1, SpanKind.CLIENT, {"http.request.method": "POST", "server.address": "dogfood-ledger"}, s, ledger_client)
             return t.span("dogfood-payments", "POST /charge", a + MS // 2, 1, SpanKind.SERVER, {"http.request.method": "POST", "http.route": "/charge", "http.response.status_code": 200, "payment.provider": provider}, c, pay_server)
 
         at = t.span("web", "POST dogfood-payments", at, 1, SpanKind.CLIENT, {"http.request.method": "POST", "server.address": "dogfood-payments", "payment.provider": provider}, root, pay_client)
