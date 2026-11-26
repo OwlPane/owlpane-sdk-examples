@@ -1,15 +1,17 @@
 import os
 import time
 from opentelemetry import trace
-from opentelemetry.trace import Status, StatusCode
 
 from owlpane import shutdown, start
+
+from journey import emit_journeys
 
 fn = start()
 if fn is None:
     raise SystemExit("owlpane did not start — check examples/.env")
 
 rich_mode = os.environ.get("OWLPANE_DOGFOOD_MODE") == "rich"
+journeys = 0
 tracer = trace.get_tracer("owlpane-dogfood")
 
 with tracer.start_as_current_span(
@@ -39,14 +41,7 @@ if rich_mode:
     ):
         time.sleep(0.01)
 
-    with tracer.start_as_current_span(
-        "POST /checkout",
-        kind=trace.SpanKind.SERVER,
-        attributes={"http.request.method": "POST", "http.route": "/checkout", "http.response.status_code": 500},
-    ) as err_span:
-        err = RuntimeError("Inventory reservation failed for SKU-42")
-        err_span.record_exception(err)
-        err_span.set_status(Status(StatusCode.ERROR, str(err)))
+    journeys = emit_journeys(trace.get_tracer_provider(), int(os.environ.get("OWLPANE_DOGFOOD_JOURNEYS", "40")))
 
 metrics_sleep = int(os.environ.get("OWLPANE_DOGFOOD_METRICS_SLEEP_SEC", "6"))
 if metrics_sleep > 0:
@@ -55,5 +50,5 @@ if metrics_sleep > 0:
 shutdown()
 
 print(
-    f"span{' + rich trace' if rich_mode else ''} emitted ({os.environ.get('OTEL_SERVICE_NAME', 'owlpane-sdk-python')})"
+    f"span{f' + {journeys} checkout journeys' if rich_mode else ''} emitted ({os.environ.get('OTEL_SERVICE_NAME', 'owlpane-sdk-python')})"
 )
