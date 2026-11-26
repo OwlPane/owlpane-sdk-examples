@@ -18,6 +18,7 @@ const {
   metrics,
   SpanKind,
   SpanStatusCode,
+  context,
   logs,
   SeverityNumber,
 } = require("@owlpane/node");
@@ -188,6 +189,110 @@ if (rich) {
   const waitMs = Math.max(0, Number(process.env.OWLPANE_DOGFOOD_METRICS_WAIT_MS ?? "6500") || 6500);
   if (waitMs > 0) await new Promise((r) => setTimeout(r, waitMs));
 }
+
+// LLM Insights, Quality and Delivery read gen_ai.* and cicd.* spans. One app each emits them, so volume stays realistic.
+const LLM_MODELS = [
+  { system: "openai", model: "gpt-4o-mini", inPerTok: 0.15e-6, outPerTok: 0.6e-6 },
+  { system: "anthropic", model: "claude-haiku-4-5", inPerTok: 1e-6, outPerTok: 5e-6 },
+];
+
+async function emitLlmCalls() {
+  await tracer.startActiveSpan(
+    "POST /api/assist",
+    { kind: SpanKind.SERVER, attributes: { "http.request.method": "POST", "http.route": "/api/assist", "http.response.status_code": 200 } },
+    async (req) => {
+      for (const m of LLM_MODELS) {
+        const input = 400 + Math.floor(Math.random() * 1600);
+        const output = 80 + Math.floor(Math.random() * 400);
+        const rateLimited = Math.random() < 0.08;
+        await tracer.startActiveSpan(
+          `chat ${m.model}`,
+          {
+            kind: SpanKind.CLIENT,
+            attributes: {
+              "gen_ai.system": m.system,
+              "gen_ai.operation.name": "chat",
+              "gen_ai.request.model": m.model,
+              "gen_ai.response.model": m.model,
+              "gen_ai.usage.input_tokens": input,
+              "gen_ai.usage.output_tokens": rateLimited ? 0 : output,
+              "gen_ai.usage.cost": rateLimited ? 0 : Number((input * m.inPerTok + output * m.outPerTok).toFixed(6)),
+            },
+          },
+          async (call) => {
+            await new Promise((r) => setTimeout(r, rateLimited ? 40 : 300 + Math.random() * 900));
+            if (rateLimited) {
+              call.setAttribute("error.type", "429");
+              call.setStatus({ code: SpanStatusCode.ERROR, message: "rate limited" });
+            }
+            call.end();
+          },
+        );
+      }
+      req.end();
+    },
+  );
+}
+
+async function emitPipelineRun() {
+  const now = Date.now();
+  const failed = Math.random() < 0.2;
+  const runId = String(now);
+  const tasks = [
+    ["build", 95_000],
+    ["test", 140_000],
+    ["deploy", 45_000],
+  ];
+  const total = tasks.reduce((s, [, ms]) => s + ms, 0);
+  const start = now - total;
+  const env = process.env.OWLPANE_ENVIRONMENT || "production";
+  const root = tracer.startSpan("pipeline storefront-ci", {
+    kind: SpanKind.INTERNAL,
+    startTime: start,
+    attributes: {
+      "cicd.system": "github_actions",
+      "cicd.pipeline.name": "storefront-ci",
+      "cicd.pipeline.run.id": runId,
+      "cicd.pipeline.result": failed ? "failure" : "success",
+      "vcs.repository.url.full": "https://github.com/example/storefront",
+      "vcs.ref.head.name": "main",
+      "vcs.ref.head.revision": Math.random().toString(16).slice(2).padEnd(40, "0").slice(0, 40),
+      "vcs.commit.timestamp": start - 120_000,
+      ...(failed ? {} : { "owlpane.deploy.environment": env }),
+    },
+  });
+  const ctx = trace.setSpan(context.active(), root);
+  let t = start;
+  for (const [name, ms] of tasks) {
+    // A failed run stops at test, the usual place a pipeline goes red.
+    const taskFailed = failed && name === "test";
+    if (failed && name === "deploy") break;
+    const task = tracer.startSpan(
+      `task ${name}`,
+      {
+        kind: SpanKind.INTERNAL,
+        startTime: t,
+        attributes: {
+          "cicd.pipeline.name": "storefront-ci",
+          "cicd.pipeline.run.id": runId,
+          "cicd.pipeline.task.name": name,
+          "cicd.pipeline.task.run.result": taskFailed ? "failure" : "success",
+        },
+      },
+      ctx,
+    );
+    if (taskFailed) task.setStatus({ code: SpanStatusCode.ERROR, message: "2 tests failed" });
+    t += ms;
+    task.end(t);
+  }
+  if (failed) root.setStatus({ code: SpanStatusCode.ERROR, message: "test failed" });
+  root.end(failed ? t : start + total);
+}
+
+if (rich && appId === (process.env.OWLPANE_DOGFOOD_LLM_APP ?? "serverless")) await emitLlmCalls();
+// About one run every five minutes at the ~45 s dogfood tick.
+const ciRate = Number(process.env.OWLPANE_DOGFOOD_CI_RATE ?? "0.15");
+if (rich && appId === (process.env.OWLPANE_DOGFOOD_CI_APP ?? "dotnet") && Math.random() < ciRate) await emitPipelineRun();
 
 logs.getLogger("owlpane-dogfood").emit({
   severityNumber: SeverityNumber.INFO,
