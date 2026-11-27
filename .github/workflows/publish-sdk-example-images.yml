@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   meta:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON((github.base_ref == 'main' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/gh-readonly-queue/main/') || github.ref_type == 'tag') && (vars.CI_RUNS_ON_MAIN || '["self-hosted","linux","aws"]') || (vars.CI_RUNS_ON || '["self-hosted","linux","aws"]')) }}
     permissions:
       contents: read
     outputs:
@@ -70,7 +70,7 @@ jobs:
 
   trigger-sdk-publish:
     needs: meta
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON((github.base_ref == 'main' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/gh-readonly-queue/main/') || github.ref_type == 'tag') && (vars.CI_RUNS_ON_MAIN || '["self-hosted","linux","aws"]') || (vars.CI_RUNS_ON || '["self-hosted","linux","aws"]')) }}
     permissions:
       contents: read
     steps:
