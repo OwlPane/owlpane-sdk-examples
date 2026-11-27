@@ -1,0 +1,59 @@
+receivers:
+  postgresql/x0:
+    endpoint: "postgres:5432"
+    transport: tcp
+    username: owlpane
+    password: owlpane-test-password
+    tls:
+      insecure: true
+    collection_interval: 15s
+  mysql/x0:
+    endpoint: "mysql:3306"
+    username: root
+    password: owlpane-test-password
+    collection_interval: 15s
+  mongodb/x0:
+    hosts:
+      - endpoint: "mongodb:27017"
+    username: owlpane
+    password: owlpane-test-password
+    direct_connection: true
+    auth_source: admin
+    tls:
+      insecure: true
+    collection_interval: 15s
+  redis/x0:
+    endpoint: "redis:6379"
+    collection_interval: 15s
+  rabbitmq/x0:
+    endpoint: "http://rabbitmq:15672"
+    username: owlpane
+    password: owlpane-test-password
+    collection_interval: 15s
+  kafkametrics/x0:
+    brokers: ["kafka:9092"]
+    scrapers: [brokers, topics, consumers]
+    collection_interval: 15s
+  nginx/x0:
+    endpoint: "http://nginx:80/stub_status"
+    collection_interval: 15s
+
+processors:
+  memory_limiter: { check_interval: 1s, limit_percentage: 80, spike_limit_percentage: 20 }
+  resource/smoke:
+    attributes:
+      - { key: deployment.environment.name, value: staging, action: insert }
+  batch: { send_batch_size: 512, timeout: 5s }
+
+exporters:
+  otlphttp:
+    endpoint: "${env:OWLPANE_INGEST_URL}"
+    headers:
+      Authorization: "Bearer ${env:OWLPANE_INGEST_KEY}"
+
+service:
+  pipelines:
+    metrics:
+      receivers: [postgresql/x0, mysql/x0, mongodb/x0, redis/x0, rabbitmq/x0, kafkametrics/x0, nginx/x0]
+      processors: [memory_limiter, resource/smoke, batch]
+      exporters: [otlphttp]

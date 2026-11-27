@@ -7,7 +7,7 @@
     "start": "node --import tsx src/simulator.ts"
   },
   "dependencies": {
-    "@owlpane/node": "workspace:*"
+    "@owlpane/node": "^0.1.12"
   },
   "devDependencies": {
     "tsx": "^4.19.0"
