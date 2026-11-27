@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   validate:
-    runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '["self-hosted","linux","aws"]') }}
+    runs-on: ${{ fromJSON((github.base_ref == 'main' || github.ref == 'refs/heads/main' || github.ref_type == 'tag') && (vars.CI_RUNS_ON_MAIN || '["self-hosted","linux","aws"]') || (vars.CI_RUNS_ON || '["self-hosted","linux","aws"]')) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
