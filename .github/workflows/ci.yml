@@ -1,5 +1,6 @@
 name: CI
 on:
+  merge_group:
   pull_request:
   push:
     branches: [main]
@@ -9,7 +10,7 @@ permissions:
 
 jobs:
   validate:
-    runs-on: ${{ fromJSON((github.base_ref == 'main' || github.ref == 'refs/heads/main' || github.ref_type == 'tag') && (vars.CI_RUNS_ON_MAIN || '["self-hosted","linux","aws"]') || (vars.CI_RUNS_ON || '["self-hosted","linux","aws"]')) }}
+    runs-on: ${{ fromJSON((github.base_ref == 'main' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/gh-readonly-queue/main/') || github.ref_type == 'tag') && (vars.CI_RUNS_ON_MAIN || '["self-hosted","linux","aws"]') || (vars.CI_RUNS_ON || '["self-hosted","linux","aws"]')) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
