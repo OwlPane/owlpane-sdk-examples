@@ -6,7 +6,7 @@ Run and verify every local-capable Owlpane integration with **zero external clou
 
 ```bash
 export OWLPANE_INGEST_URL=http://host.docker.internal:4318
-export OWLPANE_INGEST_KEY=owl_ing_your_project_key
+export OWLPANE_INGEST_KEY=owl_ing_replace_me
 export OWLPANE_API_URL=http://host.docker.internal:4100
 export OWLPANE_TOKEN=owl_pat_or_owl_sa_token
 
@@ -24,7 +24,7 @@ Services started:
 
 ```bash
 OWLPANE_INGEST_URL=http://127.0.0.1:4318 \
-OWLPANE_INGEST_KEY=owl_ing_your_project_key \
+OWLPANE_INGEST_KEY=owl_ing_replace_me \
 OWLPANE_API_URL=http://127.0.0.1:4100 \
 OWLPANE_TOKEN=owl_pat_or_owl_sa_token \
 node integrations-test/test-all-integrations.mjs
